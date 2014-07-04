@@ -5,6 +5,7 @@ import it.jacopofar.fleximatcher.annotations.DefaultAnnotationHandler;
 import it.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
 import it.jacopofar.fleximatcher.expressions.ExpressionParser;
 import it.jacopofar.fleximatcher.italian.ItPosRuleFactory;
+import it.jacopofar.fleximatcher.italian.ItVerbRuleFactory;
 import it.jacopofar.fleximatcher.rule.RegexRuleFactory;
 import it.jacopofar.fleximatcher.rule.RuleFactory;
 import it.jacopofar.fleximatcher.rules.InsensitiveCaseRuleFactory;
@@ -93,6 +94,8 @@ public class FlexiMatcher {
 	public static void main(String argc[]){
 		FlexiMatcher fm=new FlexiMatcher();
 		fm.bind("it-pos", new ItPosRuleFactory());
+		fm.bind("it-verb", new ItVerbRuleFactory());
+		
 		String analyzeThis=" il cane è alto!";
 		System.out.println(fm.matches("[it-pos:RD] [it-pos:Ss] è [it-pos:As]",analyzeThis, new ResultPrintingAnnotationHandler(analyzeThis),true,false));
 	}
