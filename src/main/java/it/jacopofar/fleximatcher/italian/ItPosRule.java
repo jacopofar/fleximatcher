@@ -48,8 +48,7 @@ public class ItPosRule extends MatchingRule {
 	}
 
 	@Override
-	public String getDescription() {
+	public String toString() {
 		return "matches the italian POS tag "+tag+" ("+POSUtils.getDescription(tag)+")";
 	}
-
 }
