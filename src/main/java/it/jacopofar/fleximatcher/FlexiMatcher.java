@@ -5,13 +5,15 @@ import it.jacopofar.fleximatcher.annotations.DefaultAnnotationHandler;
 import it.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
 import it.jacopofar.fleximatcher.expressions.ExpressionParser;
 import it.jacopofar.fleximatcher.italian.ItPosRuleFactory;
-import it.jacopofar.fleximatcher.italian.ItVerbRuleFactory;
+import it.jacopofar.fleximatcher.italian.ItSpecificVerbRuleFactory;
+import it.jacopofar.fleximatcher.italian.ItVerbFormRuleFactory;
 import it.jacopofar.fleximatcher.rule.RegexRuleFactory;
 import it.jacopofar.fleximatcher.rule.RuleFactory;
 import it.jacopofar.fleximatcher.rules.InsensitiveCaseRuleFactory;
 import it.jacopofar.fleximatcher.rules.MatchingRule;
 import it.jacopofar.fleximatcher.rules.MultiRuleFactory;
 import it.jacopofar.fleximatcher.rules.PlainTextRule;
+import it.jacopofar.fleximatcher.tag.TagRuleFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FlexiMatcher {
 
 	private ConcurrentHashMap<String,RuleFactory> rules=new ConcurrentHashMap<String,RuleFactory>();
+	private TagRuleFactory factory;
 	/**
 	 * Add or replace a rule, binding it to a name.
 	 * Returns true if the same name was already in use and the RuleFactory has been replaced, false otherwise
@@ -60,14 +63,9 @@ public class FlexiMatcher {
 		for(MatchingRule mr:ruleset){
 			if(!mr.isCacheable() || !ah.hasBeenUsed(ruleParts[i++])){
 				ah.setCurrentMatcher(ruleParts[i-1]);
-				int annotationBefore=ah.getAnnotationNumbers();
 				boolean singleMatch = mr.annotate(text,ah);
 				if(ruleParts.length==1 && singleMatch)
 					return true;
-				if(annotationBefore<ah.getAnnotationNumbers() && mr.getTag().isPresent()){
-					//the current rule changed some tag, remember it
-					ah.notifyChangedTag(mr.getTag().get());
-				}
 			}
 			ah.rememberUse(ruleParts[i-1]);
 		}
@@ -76,7 +74,6 @@ public class FlexiMatcher {
 		if(isSurelyWrong)
 			return false;
 		return ah.checkAnnotationSequence(ruleParts, text.length(),matchWhole);
-		
 	}
 
 
@@ -89,14 +86,28 @@ public class FlexiMatcher {
 		this.bind("r", new RegexRuleFactory());
 		this.bind("i", new InsensitiveCaseRuleFactory());
 		this.bind("multi", new MultiRuleFactory(this));
+		factory=new TagRuleFactory(this);
+		this.bind("tag", factory);
 	}
 
 	public static void main(String argc[]){
 		FlexiMatcher fm=new FlexiMatcher();
 		fm.bind("it-pos", new ItPosRuleFactory());
-		fm.bind("it-verb", new ItVerbRuleFactory());
-		
-		String analyzeThis=" il cane è alto!";
-		System.out.println(fm.matches("[it-pos:RD] [it-pos:Ss] è [it-pos:As]",analyzeThis, new ResultPrintingAnnotationHandler(analyzeThis),true,false));
+		fm.bind("it-verb-conjugated", new ItSpecificVerbRuleFactory());
+		fm.bind("it-verb-form", new ItVerbFormRuleFactory());
+		fm.addTagRule("frutto","mela","id_mela");
+		String analyzeThis=" il cane mangia la mela";
+		System.out.println(fm.matches(analyzeThis,"[it-pos:RD] [it-pos:Ss] Ã¨ [it-pos:As]", new ResultPrintingAnnotationHandler(analyzeThis),true,false));
+		System.out.println(fm.matches(analyzeThis,"[it-verb-conjugated:mangiare]", new ResultPrintingAnnotationHandler(analyzeThis),true,false));
+	}
+
+	/**
+	 * Add a rule to match a tag to this matcher
+	 * @param tag the tag to use
+	 * @param pattern the pattern to match
+	 * @param identifier the rule identifier
+	 * */
+	private void addTagRule(String tag, String pattern, String identifier) {
+		factory.addTagRule(tag,pattern,identifier);
 	}
 }
