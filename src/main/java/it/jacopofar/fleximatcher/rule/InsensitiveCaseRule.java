@@ -32,8 +32,8 @@ public class InsensitiveCaseRule extends MatchingRule {
 	}
 
 	@Override
-	public String getDescription() {
-		return "plain text:'"+string+"'";
+	public String toString() {
+		return "case insensitive text:'"+string+"'";
 	}
 
 }
