@@ -6,16 +6,26 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.json.JSONObject;
+
 import opennlp.tools.util.Span;
 
-import org.json.JSONObject;
 
 public class DefaultAnnotationHandler extends AnnotationHandler {
 	private HashMap<Integer,Set<TextAnnotation>> annotationsStored =new HashMap<Integer,Set<TextAnnotation>>();
 	private int numAnnotations;
-
+	private HashSet<TextAnnotation> added=new HashSet<TextAnnotation>();
 	@Override
 	public void addAnnotation(Span span, JSONObject attributes) {
+		numAnnotations++;
+		if(!annotationsStored.containsKey(span.getStart())){
+			annotationsStored.put(span.getStart(), new HashSet<TextAnnotation>());
+		}
+		TextAnnotation ta = new TextAnnotation(span,currentMatcher,attributes);
+		annotationsStored.get(span.getStart()).add(ta);
+		added.add(ta);
+	}
+	public void addAnnotationFromSubHandler(Span span, JSONObject attributes) {
 		numAnnotations++;
 		if(!annotationsStored.containsKey(span.getStart())){
 			annotationsStored.put(span.getStart(), new HashSet<TextAnnotation>());
@@ -32,7 +42,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 			return length==0 || matchWhole;
 		/*
 		 * The method is very simple:
-		 * the startPosition set contains the starting points (initially just 0)
+		 * the startPosition set contains the starting points (initially just 0, or any possible position for matchWhole=false)
 		 * Iterate on the rules to match and look for ones that start frome one of the starting position
 		 * for each of them add athe ending positions to a new set of positions
 		 * if this new set stays empty, return false
@@ -43,8 +53,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 		HashSet<Integer> startPositions=new HashSet<Integer>();
 		startPositions.add(0);
 		if(!matchWhole){
-			for(int i=1;i<length;i++)
-				startPositions.add(i);
+			startPositions.addAll(annotationsStored.keySet());
 		}
 		for(String p:ruleParts){
 			HashSet<Integer> newStartPositions=new HashSet<Integer>();
@@ -65,7 +74,20 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 
 	@Override
 	public Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream() {
-		 return annotationsStored.entrySet().stream();
+		return annotationsStored.entrySet().stream();
 	}
+	@Override
+	public Stream<TextAnnotation> getAnnotationsAtThisLevelStream() {
+		return added.stream();
+	}
+	@Override
+	public AnnotationHandler getSubHandler(String newCurrentMatcher) {
+		return new DefaultSubHandler(this,newCurrentMatcher);
+	}
+	@Override
+	public int getNestingLevel() {
+		return 0;
+	}
+	
 
 }
