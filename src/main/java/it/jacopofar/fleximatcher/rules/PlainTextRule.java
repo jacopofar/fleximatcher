@@ -30,7 +30,7 @@ public class PlainTextRule extends MatchingRule {
 	}
 
 	@Override
-	public String getDescription() {
+	public String toString() {
 		return "plain text:'"+string+"'";
 	}
 

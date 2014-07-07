@@ -42,7 +42,7 @@ public class RegexRule extends MatchingRule {
 	}
 
 	@Override
-	public String getDescription() {
+	public String toString() {
 		return "regular expression:'"+pattern+"'";
 	}
 
