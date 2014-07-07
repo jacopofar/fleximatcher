@@ -1,8 +1,8 @@
 package test.it.jacopofar.fleximatcher;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import it.jacopofar.fleximatcher.FlexiMatcher;
+import it.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -23,14 +23,14 @@ public class TestBasic {
 
 	@Test
 	public void testInsensitive() {
-		assertTrue(fm.matches("AbC", "AbC"));
+		assertTrue("identity",fm.matches("AbC", "AbC"));
 		assertTrue(fm.matches("AbC", "A[i:B]C"));
 		assertFalse(fm.matches("AbC", "ABC"));
 		assertTrue(fm.matches("AbC", "A[i:B]C"));
 	}
 	@Test
 	public void testRegex() {
-		assertTrue(fm.matches("AbC", "AbC"));
+		assertTrue("identity",fm.matches("AbC", "AbC"));
 		assertFalse(fm.matches("AbC", "A[r:[BD]+]C"));
 		assertTrue(fm.matches("AbC", "A[r:[bD]+]C"));
 		assertFalse(fm.matches("AbC", "ABC"));
@@ -44,6 +44,10 @@ public class TestBasic {
 		assertTrue(fm.matches("AbC", "A[multi:[r:[bD]+][i:B]]C"));
 		assertFalse(fm.matches("AbC", "A[r:[BD]+]C"));
 		assertFalse(fm.matches("AbC", "ABC"));
+		ResultPrintingAnnotationHandler ah = new ResultPrintingAnnotationHandler("AbC");
+		assertTrue("nested multi",fm.matches("AbC", "A[multi:[r:[bD]+][i:B][multi:b]]C",ah, true,true));
+		assertEquals("number of annotations at top level",3.0,ah.getAnnotationsAtThisLevelStream().count(),0.0);
+		
 	}
 
 }
