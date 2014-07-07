@@ -5,9 +5,12 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import opennlp.tools.util.Span;
+
 
 import org.json.JSONObject;
+
+import opennlp.tools.util.Span;
+
 
 public abstract class AnnotationHandler {
 
@@ -33,6 +36,7 @@ public abstract class AnnotationHandler {
 	public String getCurrentMatcher(){
 		return currentMatcher;
 	}
+	
 	public boolean hasBeenUsed(String string) {
 		return matchedRules.contains(string);
 	}
@@ -61,12 +65,21 @@ public abstract class AnnotationHandler {
 	 * The annotations given to the new AnnotationHandler will be stored in the current AnnotationHandler, the real difference is that the 
 	 * current matcher will stay the same and the returned AnnotationHandler will use the given one
 	 * */
-	public AnnotationHandler getSubHandler(String newCurrentMatcher){
-		return new SubHandler(this,newCurrentMatcher);
-	}
+	public abstract AnnotationHandler getSubHandler(String newCurrentMatcher);
 	/**
-	 * Return an unsorted stream of 
+	 * Return a stream of positions with sets of annotations starting at that position.
+	 * This includes all of the annotations
+	 * 
 	 * */
 	public abstract Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream();
+	/**
+	 * Return a stream of annotations added at this level, that is, not in subhandlers
+	 * */
+	public abstract Stream<TextAnnotation> getAnnotationsAtThisLevelStream();
+	/**
+	 * Return the nesting level of this AnnotationHandler, that is, the number of subhandlers levels
+	 * The root AnnotationHandler is at level 0, a subhandler has level 1, the a subhandler obtained from it has level 2, and so on.
+	 * */
+	public abstract int getNestingLevel();
 
 }
