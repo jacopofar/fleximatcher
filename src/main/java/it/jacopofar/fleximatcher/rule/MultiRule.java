@@ -2,7 +2,6 @@ package it.jacopofar.fleximatcher.rule;
 
 import it.jacopofar.fleximatcher.FlexiMatcher;
 import it.jacopofar.fleximatcher.annotations.AnnotationHandler;
-import it.jacopofar.fleximatcher.annotations.TextAnnotation;
 import it.jacopofar.fleximatcher.expressions.ExpressionParser;
 import it.jacopofar.fleximatcher.rules.MatchingRule;
 
@@ -27,40 +26,41 @@ public class MultiRule extends MatchingRule {
 
 	@Override
 	public boolean annotate(String text, AnnotationHandler ah) {
+		boolean matchAll=true;
+		HashSet<Span> candidateSpans=null;
 		for(String condition:matchers){
 			AnnotationHandler sa;
 			sa=ah.getSubHandler(condition);
-			fm.matches(text, condition,sa, true,false);
-		}
-		HashSet<Span> toAdd=new HashSet<Span>();
-		ah.getAnnotationsPositionalStream().forEach(candidates->{
-			for(TextAnnotation ta:candidates.getValue()){
-				if(ta.getType().equals(matchers.get(0))){
-					int expectedEnd=ta.getSpan().getEnd();
-					//we found an annotation corresponding to the first one in the list of the matchers
-					//let's look if any annotation in the list is present in this set with that ending position
-					boolean notMatching=false;
-					for(String mat:matchers){
-						if(!candidates.getValue().stream().anyMatch(k->k.getType().equals(mat) && k.getSpan().getEnd()==expectedEnd)){
-							notMatching=true;
-						}
+			matchAll&=fm.matches(text, condition,sa, true,true);
+			if(candidateSpans!=null && candidateSpans.size()==0){
+				//we already know that the match failed
+				return false;
+			}
+			else{
+				if(candidateSpans==null){
+					candidateSpans=new HashSet<Span>();
+					for(Span t:sa.getAnnotationsAtThisLevelStream().map(t->t.getSpan()).toArray(a->new Span[a]))
+						candidateSpans.add(t);
+				}
+				else{
+					//keep only the TextAnnotations matching with the current ones
+					HashSet<Span> newSet=new HashSet<Span>();
+					for(Span t:sa.getAnnotationsAtThisLevelStream().map(t->t.getSpan()).toArray(a->new Span[a])){
+						if(candidateSpans.contains(t))
+							newSet.add(t);
 					}
-					if(!notMatching){
-						toAdd.add(ta.getSpan());	
-					}
+					candidateSpans=newSet;
 				}
 			}
-		});
-		for(Span s:toAdd)
+		}
+		for(Span s:candidateSpans)
 			ah.addAnnotation(s, null);
-		return toAdd.stream().anyMatch(
-				p->(p.getStart()==0 && p.getEnd()==text.length())
-				);
+		return matchAll;
 
 	}
 
 	@Override
-	public String getDescription() {
+	public String toString() {
 		return "multi matcher:"+Arrays.deepToString(matchers.toArray());
 	}
 
