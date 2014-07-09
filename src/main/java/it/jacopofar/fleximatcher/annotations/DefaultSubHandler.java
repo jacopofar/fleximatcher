@@ -10,42 +10,45 @@ import org.json.JSONObject;
 import opennlp.tools.util.Span;
 
 
-public class DefaultSubHandler extends DefaultAnnotationHandler {
+public class DefaultSubHandler extends AnnotationHandler {
 
-	private DefaultAnnotationHandler wrappedHandler;
-	private String subCurrentMatcher;
-	private HashSet<TextAnnotation> added=new HashSet<TextAnnotation>();
+	private AnnotationHandler wrappedHandler;
+	private final HashSet<TextAnnotation> addedSub=new HashSet<TextAnnotation>();
 	private int nestingLevel;
-	public DefaultSubHandler(DefaultAnnotationHandler annotationHandler,
+	public DefaultSubHandler(AnnotationHandler annotationHandler,
 			String currentMatcher) {
 		this.wrappedHandler=annotationHandler;
-		this.subCurrentMatcher=currentMatcher;
+		this.currentMatcher=currentMatcher;
 		this.nestingLevel=annotationHandler.getNestingLevel()+1;
 	}
 
 	@Override
 	public void addAnnotation(Span span, JSONObject attributes) {
-		String beforeMatcher=wrappedHandler.getCurrentMatcher();
-		added.add(new TextAnnotation(span, subCurrentMatcher, attributes));
+		addedSub.add(new TextAnnotation(span, currentMatcher, attributes));
 		synchronized(wrappedHandler){
-			wrappedHandler.setCurrentMatcher(subCurrentMatcher);
-			
+			String beforeMatcher=wrappedHandler.getCurrentMatcher();
+			wrappedHandler.setCurrentMatcher(currentMatcher);
 			wrappedHandler.addAnnotationFromSubHandler(span, attributes);
 			wrappedHandler.setCurrentMatcher(beforeMatcher);
 		}
 	}
 	@Override
 	public void addAnnotationFromSubHandler(Span span, JSONObject attributes) {
-		wrappedHandler.addAnnotationFromSubHandler(span, attributes);
+		synchronized(wrappedHandler){
+			String beforeMatcher=wrappedHandler.getCurrentMatcher();
+			wrappedHandler.setCurrentMatcher(currentMatcher);
+			wrappedHandler.addAnnotationFromSubHandler(span, attributes);
+			wrappedHandler.setCurrentMatcher(beforeMatcher);
+		}
 	}
 	@Override
-	public int getAnnotationNumbers() {
-		return wrappedHandler.getAnnotationNumbers();
+	public int getAnnotationsCount() {
+		return wrappedHandler.getAnnotationsCount();
 	}
 
 	@Override
-	public boolean checkAnnotationSequence(String[] ruleParts, int length, boolean matchWhole) {
-		return wrappedHandler.checkAnnotationSequence(ruleParts, length,matchWhole);
+	public MatchingResults checkAnnotationSequence(String[] ruleParts, int length, boolean matchWhole,boolean populateResult) {
+		return wrappedHandler.checkAnnotationSequence(ruleParts, length,matchWhole,populateResult);
 	}
 
 	@Override
@@ -55,7 +58,7 @@ public class DefaultSubHandler extends DefaultAnnotationHandler {
 
 	@Override
 	public Stream<TextAnnotation> getAnnotationsAtThisLevelStream() {
-		return added.stream();
+		return addedSub.stream();
 	}
 
 	@Override
@@ -64,6 +67,17 @@ public class DefaultSubHandler extends DefaultAnnotationHandler {
 	}
 	public int getNestingLevel() {
 		return nestingLevel;
+	}
+
+	public void setCurrentMatcher(String rule){
+		currentMatcher=rule;
+	}
+
+	public boolean hasBeenUsed(String string) {
+		return wrappedHandler.hasBeenUsed(string);
+	}
+	public void rememberUse(String string) {
+		wrappedHandler.rememberUse(string);
 	}
 
 }

@@ -16,7 +16,6 @@ public abstract class AnnotationHandler {
 
 	protected String currentMatcher;
 	private HashSet<String> matchedRules=new HashSet<String>();
-	private HashSet<String> changedTags=new HashSet<String>();
 
 
 	/**
@@ -44,13 +43,10 @@ public abstract class AnnotationHandler {
 		matchedRules.add(string);
 	}
 
-	public abstract int getAnnotationNumbers();
-	
-	public void notifyChangedTag(String string) {
-		changedTags.add(string);
-	}
+	public abstract int getAnnotationsCount();
+
 	/**
-	 * Check whether exist a sequence of contiguous annotations with the given tag covering the whole length of the string.
+	 * Check whether exist a sequence of contiguous annotations with the given tag covering the whole length of the string and returns the corresponding annotations if required.
 	 * This is a sequence of annotations with the following characteristics:
 	 * 1. Their getType() values are exactly the values contained in ruleParts, in the same order
 	 * 2. The span of an element ends exactly where the next one starts
@@ -58,8 +54,9 @@ public abstract class AnnotationHandler {
 	 * @param matchWhole false if the sequence can not cover the whole string (that is, the rukle 3 is not applied)
 	 * @param rulePars an array of expected rules
 	 * @lenth the length of the text to match, which will be the end of the last span
+	 * @param populateResult whether ot not populate the resulting object with the sequences. If those are not necessary, a fair amoutn of calculation can be avoided
 	 * */
-	public abstract boolean checkAnnotationSequence(String[] ruleParts, int length, boolean matchWhole);
+	public abstract MatchingResults checkAnnotationSequence(String[] ruleParts, int length, boolean matchWhole,boolean populateResult);
 	/**
 	 * Returns an annotation handler to manage subrequests (that is, match requests made by rules while annotating)
 	 * The annotations given to the new AnnotationHandler will be stored in the current AnnotationHandler, the real difference is that the 
@@ -81,5 +78,10 @@ public abstract class AnnotationHandler {
 	 * The root AnnotationHandler is at level 0, a subhandler has level 1, the a subhandler obtained from it has level 2, and so on.
 	 * */
 	public abstract int getNestingLevel();
+	
+	/**
+	 * Store an annotation from a subhandler, it will not be among the ones retrieved by getAnnotationsAtThisLevelStream()
+	 * */
+	public abstract void addAnnotationFromSubHandler(Span span, JSONObject attributes);
 
 }

@@ -2,7 +2,9 @@ package it.jacopofar.fleximatcher;
 
 import it.jacopofar.fleximatcher.annotations.AnnotationHandler;
 import it.jacopofar.fleximatcher.annotations.DefaultAnnotationHandler;
+import it.jacopofar.fleximatcher.annotations.MatchingResults;
 import it.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
+import it.jacopofar.fleximatcher.annotations.TextAnnotation;
 import it.jacopofar.fleximatcher.expressions.ExpressionParser;
 import it.jacopofar.fleximatcher.italian.ItPosRuleFactory;
 import it.jacopofar.fleximatcher.italian.ItSpecificVerbRuleFactory;
@@ -15,6 +17,7 @@ import it.jacopofar.fleximatcher.rules.MultiRuleFactory;
 import it.jacopofar.fleximatcher.rules.PlainTextRule;
 import it.jacopofar.fleximatcher.tag.TagRuleFactory;
 
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -40,7 +43,7 @@ public class FlexiMatcher {
 	 * @param matchWhole if true, will match the pattern against the whole text, if false will search for it inside the string.
 	 * For example matches("this is the dog!","the [r:[a-z]+]",ah, true, false) will return true ignoring the leading "this is " and the trailing "!"
 	 * */
-	public boolean matches(String text,String pattern, AnnotationHandler ah, boolean fullyAnnotate,boolean matchWhole){
+	public MatchingResults matches(String text,String pattern, AnnotationHandler ah, boolean fullyAnnotate,boolean matchWhole,boolean populateResult){
 		String[] ruleParts = ExpressionParser.split(pattern);
 		MatchingRule[] ruleset=new MatchingRule[ruleParts.length];
 		int i=0;
@@ -49,7 +52,7 @@ public class FlexiMatcher {
 			if(!s.startsWith("[")){
 				if(!text.contains(s))
 					if(!fullyAnnotate)
-						return false;
+						return MatchingResults.noMatch();
 					else
 						isSurelyWrong=true;
 				ruleset[i++]=new PlainTextRule(s);
@@ -59,27 +62,23 @@ public class FlexiMatcher {
 			}
 		}
 		//now the ruleset is created, annotate using it
-		i=0;
-		for(MatchingRule mr:ruleset){
-			if(!mr.isCacheable() || !ah.hasBeenUsed(ruleParts[i++])){
-				ah.setCurrentMatcher(ruleParts[i-1]);
-				boolean singleMatch = mr.annotate(text,ah);
-				if(ruleParts.length==1 && singleMatch)
-					return true;
+		
+		for(i=0;i<ruleset.length;i++){
+			if(!ruleset[i].isCacheable() || !ah.hasBeenUsed(ruleParts[i])){
+				ah.setCurrentMatcher(ruleParts[i]);
+				ruleset[i].annotate(text, ah);
 			}
-			ah.rememberUse(ruleParts[i-1]);
+			ah.rememberUse(ruleParts[i]);
 		}
 
 		//the text is annotated, is it surely wrong? skip the matching
 		if(isSurelyWrong)
-			return false;
-		return ah.checkAnnotationSequence(ruleParts, text.length(),matchWhole);
+			return MatchingResults.noMatch();
+		return ah.checkAnnotationSequence(ruleParts, text.length(),matchWhole,populateResult);
 	}
 
-
-
 	public boolean matches(String text,String pattern){
-		return matches(text,pattern, new DefaultAnnotationHandler(),false,true);
+		return matches(text,pattern, new DefaultAnnotationHandler(),false,true,false).isMatching();
 	}
 
 	public FlexiMatcher(){
@@ -95,19 +94,45 @@ public class FlexiMatcher {
 		fm.bind("it-pos", new ItPosRuleFactory());
 		fm.bind("it-verb-conjugated", new ItSpecificVerbRuleFactory());
 		fm.bind("it-verb-form", new ItVerbFormRuleFactory());
-		fm.addTagRule("frutto","mela","id_mela");
-		String analyzeThis=" il cane mangia la mela";
-		System.out.println(fm.matches(analyzeThis,"[it-pos:RD] [it-pos:Ss] è [it-pos:As]", new ResultPrintingAnnotationHandler(analyzeThis),true,false));
-		System.out.println(fm.matches(analyzeThis,"[it-verb-conjugated:mangiare]", new ResultPrintingAnnotationHandler(analyzeThis),true,false));
+		fm.addTagRule("frutto","pera","id_pera");
+		fm.addTagRule("frutto","la [tag:frutto]","id_nested");
+		String analyzeThis=" il cane mangia la pera";
+		for(LinkedList<TextAnnotation> k:fm.matches(analyzeThis,"la [i:pera]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true).getAnnotations().get())
+			System.out.println(">>"+k);
+		System.out.println(fm.matches(analyzeThis,"la [tag:frutto]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
+		System.out.println(fm.matches(analyzeThis,"[it-pos:RD] [it-pos:Ss] è [it-pos:As]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
+		System.out.println(fm.matches(analyzeThis,"[it-verb-conjugated:mangiare]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
 	}
 
 	/**
-	 * Add a rule to match a tag to this matcher
-	 * @param tag the tag to use
-	 * @param pattern the pattern to match
-	 * @param identifier the rule identifier
+	 * Add a rule to this matcher, which will be used to macth [tag:rulename]
+	 * @param tag the tag of the rule, which will be used in the tag [tag:name]
+	 * @param pattern the pattern that will be matched and tagged by this rule
+	 * @param identifier identifier an optional identifier for the rule, will be used to remove it
+	 * @return true if a rule with the same tag and identifier was replaced by the given one, false otherwise
+	 * If the identifier is null, it will be added and will always return false
 	 * */
-	private void addTagRule(String tag, String pattern, String identifier) {
-		factory.addTagRule(tag,pattern,identifier);
+	public boolean addTagRule(String tag, String pattern, String identifier) {
+		return factory.addTagRule(tag,pattern,identifier,null);
+	}
+	
+	/**
+	 * Add a rule to this matcher, which will be used to macth [tag:rulename]
+	 * @param tag the tag of the rule, which will be used in the tag [tag:name]
+	 * @param pattern the pattern that will be matched and tagged by this rule
+	 * @param identifier identifier an optional identifier for the rule, will be used to remove it
+	 * @param annotationTemplate a JSON string which can contain parameters in the form #N#, which will be replaced by the string at position N, then used as the generated annotation
+	 * @return true if a rule with the same tag and identifier was replaced by the given one, false otherwise
+	 * If the identifier is null, it will be added and will always return false
+	 * e.g.
+	 * */
+	public boolean addTagRule(String tag, String pattern, String identifier,String annotationTemplate) {
+		return factory.addTagRule(tag,pattern,identifier,annotationTemplate);
+	}
+	
+
+	public void removeTagRule(String tag,String identifier) {
+		factory.removeTagRule(tag,identifier);
+		
 	}
 }

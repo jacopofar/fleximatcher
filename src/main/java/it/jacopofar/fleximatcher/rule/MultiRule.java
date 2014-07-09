@@ -31,7 +31,7 @@ public class MultiRule extends MatchingRule {
 		for(String condition:matchers){
 			AnnotationHandler sa;
 			sa=ah.getSubHandler(condition);
-			matchAll&=fm.matches(text, condition,sa, true,true);
+			matchAll&=fm.matches(text, condition,sa, true,true,false).isMatching();
 			if(candidateSpans!=null && candidateSpans.size()==0){
 				//we already know that the match failed
 				return false;

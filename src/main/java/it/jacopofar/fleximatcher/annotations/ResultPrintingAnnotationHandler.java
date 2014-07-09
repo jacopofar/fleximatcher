@@ -22,9 +22,8 @@ public class ResultPrintingAnnotationHandler extends DefaultAnnotationHandler {
 	public void addAnnotationFromSubHandler(Span span, JSONObject attributes) {
 		super.addAnnotationFromSubHandler(span,attributes);
 		System.out.println("Added an annotation from a subhandler the tag '"+this.getCurrentMatcher()+ "' at "+span+": to '"+span.getCoveredText(text)+"'"+attributes);
-
 	}
-	
+
 	public void setCurrentMatcher(String rule){
 		System.out.println("set current matcher to "+rule);
 		super.setCurrentMatcher(rule);
