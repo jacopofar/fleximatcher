@@ -131,8 +131,12 @@ public class FlexiMatcher {
 	}
 	
 
-	public void removeTagRule(String tag,String identifier) {
-		factory.removeTagRule(tag,identifier);
+	/**
+	 * Remove the rule with the given tag and identifier
+	 * @return true if a rule was removed
+	 * */
+	public boolean removeTagRule(String tag,String identifier) {
+		return factory.removeTagRule(tag,identifier);
 		
 	}
 }
