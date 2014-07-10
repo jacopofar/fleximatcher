@@ -1,15 +1,16 @@
 package test.it.jacopofar.fleximatcher;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.List;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import it.jacopofar.fleximatcher.FlexiMatcher;
 import it.jacopofar.fleximatcher.annotations.AnnotationHandler;
 import it.jacopofar.fleximatcher.annotations.DefaultAnnotationHandler;
 import it.jacopofar.fleximatcher.annotations.MatchingResults;
 import it.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,6 +31,7 @@ public class TestBasic {
 
 	@Test
 	public void testInsensitive() {
+//		new TextAnnotation(new Span(3,8), "[tag:fruit]", new JSONObject("{"fruit":"apple"}"));
 		assertTrue("identity",fm.matches("AbC", "AbC"));
 		assertTrue(fm.matches("AbC", "A[i:B]C"));
 		assertFalse(fm.matches("AbC", "ABC"));
@@ -84,7 +86,6 @@ public class TestBasic {
 		assertEquals("number of annotations at top level",1,res.getAnnotations().get().size(),0.0);
 		
 		//match substrings, it will match both "an apple" and "apple"
-		System.out.println("\n\n\n\n\n\n\n\n");
 		String multiple="an apple and a pear";
 		ah = new DefaultAnnotationHandler();
 		res = fm.matches(multiple, "[tag:fruit]",ah, true,false,true);
@@ -97,7 +98,9 @@ public class TestBasic {
 		assertTrue(res.getAnnotations().isPresent());
 		assertEquals("number of annotations at top level",4,res.getAnnotations().get().size(),0.0);
 		
-		fm.removeTagRule("fruit","id_a_fruit");
+		assertTrue(fm.removeTagRule("fruit","id_a_fruit"));
+		assertFalse(fm.removeTagRule("fruit","id_a_fruit"));
+		assertFalse(fm.removeTagRule("fruit","id thatdoesn't exist"));
 		ah = new DefaultAnnotationHandler();
 		res = fm.matches(multiple, "[tag:fruit]",ah, true,false,true);
 		assertEquals("number of annotations at top level",3,res.getAnnotations().get().size(),0.0);
@@ -106,17 +109,21 @@ public class TestBasic {
 		assertTrue("contains 'pear'",matched.contains("pear"));
 		assertTrue("contains 'an apple'",matched.contains("an apple"));
 		
-		//fm = new FlexiMatcher();
 		assertTrue(fm.addTagRule("fruit", "apple", "id_apple","{'fruit':'apple'}"));
 		assertTrue(fm.addTagRule("fruit", "an [tag:fruit]", "id_an_fruit","{'fruit':'#1#'}"));
 		assertTrue(fm.addTagRule("fruit", "pear", "id_pear","{'fruit':'pear'}"));
 		assertFalse(fm.addTagRule("fruit", "a [tag:fruit]", "id_a_fruit","{'fruit':'#1#'}"));
+		
 		ah = new DefaultAnnotationHandler();
 		res = fm.matches(multiple, "[tag:fruit]",ah, true,false,true);
+		
 		matched = Arrays.asList(res.getMatchingStrings(multiple));
+		//matched = Arrays.asList(res.getHighlightedStrings(multiple));
 		assertEquals("number of annotations at top level",4,res.getAnnotations().get().size(),0.0);
 		assertTrue("contains 'apple'",matched.contains("apple"));
 		assertTrue("contains 'pear'",matched.contains("pear"));
 		assertTrue("contains 'an apple'",matched.contains("an apple"));
+		
+		
 	}
 }

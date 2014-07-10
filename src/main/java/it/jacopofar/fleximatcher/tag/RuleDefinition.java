@@ -39,10 +39,18 @@ public class RuleDefinition {
 	}
 
 	public String toString(){
-		return "rule ID="+identifier+" pattern='"+pattern+"'";
+		return "rule ID="+identifier+" pattern='"+pattern+"'"+ (annotationExpression==null?"":"annotation="+annotationExpression);
 	}
 	public int hashCode(){
 		return (pattern.hashCode()+11*(identifier==null?0:identifier.hashCode())+37*(annotationExpression==null?0:annotationExpression.hashCode()));
+	}
+	
+	public boolean equals(Object o){
+		if(!(o instanceof RuleDefinition))
+			return false;
+		return (this.pattern.equals(((RuleDefinition)o).pattern))
+				&& (this.identifier==null?((RuleDefinition)o).identifier==null : this.identifier.equals(((RuleDefinition)o).identifier))
+				&& (this.annotationExpression==null?((RuleDefinition)o).annotationExpression==null : this.annotationExpression.equals(((RuleDefinition)o).identifier));
 	}
 
 	/**
@@ -53,7 +61,8 @@ public class RuleDefinition {
 			return null;
 		String result=annotationExpression;
 		for(int i=0;i<matchSequence.size();i++){
-			result.replace("#"+i+"#", JSONObject.quote(matchSequence.get(i).getSpan().getCoveredText(text).toString()));
+			String c=JSONObject.quote(matchSequence.get(i).getSpan().getCoveredText(text).toString());
+			result=result.replace("#"+i+"#", c.substring(1,c.length()-1));
 		}
 		try {
 			return new JSONObject(result);

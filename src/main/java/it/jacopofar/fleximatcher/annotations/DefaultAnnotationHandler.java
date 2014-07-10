@@ -86,9 +86,9 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 								HashSet<LinkedList<TextAnnotation>> expandUs = candidateAnnotations.get(ann.getSpan().getStart());
 								if(expandUs==null)
 									continue;
-								for(LinkedList<TextAnnotation> l:expandUs)
+								for(LinkedList<TextAnnotation> l:expandUs){
 									l.addLast(ann);
-
+								}
 								if(newCandidateAnnotations.containsKey(ann.getSpan().getEnd())){
 									newCandidateAnnotations.get(ann.getSpan().getEnd()).addAll(expandUs);
 								}

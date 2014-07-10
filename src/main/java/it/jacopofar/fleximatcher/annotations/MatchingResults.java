@@ -46,6 +46,10 @@ public class MatchingResults {
 	public Optional<Set<LinkedList<TextAnnotation>>> getAnnotations(){
 		return Optional.ofNullable(this.annotationsSequences);
 	}
+	/**
+	 * Returns an array of the substring matching with the sequences.
+	 * This doesn't higlight the structure of the matches
+	 * */
 	public String[] getMatchingStrings(String string) {
 		if(annotationsSequences==null)
 			return new String[0];
@@ -53,6 +57,24 @@ public class MatchingResults {
 		int i=0;
 		for(LinkedList<TextAnnotation> seq:annotationsSequences){
 			res[i++]=string.substring(seq.getFirst().getSpan().getStart(),seq.getLast().getSpan().getEnd());
+		}
+		return  res;
+	}
+	
+	/**
+	 * Shows how each match was obtained and with which annotations
+	 * */
+	public String[] getHighlightedStrings(String string) {
+		if(annotationsSequences==null)
+			return new String[0];
+		String[] res=new String[annotationsSequences.size()];
+		int i=0;
+		for(LinkedList<TextAnnotation> seq:annotationsSequences){
+			String highl="";
+			for(TextAnnotation ta:seq){
+				highl+=ta.getType()+":"+string.substring(ta.getSpan().getStart(),ta.getSpan().getEnd())+" ("+ta.getJSON().flatMap(j->Optional.of(j.toString())).orElse("no annotation")+")";
+			}
+			res[i++]=highl;
 		}
 		return  res;
 	}

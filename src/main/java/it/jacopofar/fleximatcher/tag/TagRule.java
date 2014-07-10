@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import opennlp.tools.util.Span;
 import it.jacopofar.fleximatcher.FlexiMatcher;
 import it.jacopofar.fleximatcher.annotations.AnnotationHandler;
@@ -36,9 +38,10 @@ public class TagRule extends MatchingRule {
 			Optional<Set<LinkedList<TextAnnotation>>> subMatches = ruleFactory.getMatcher().matches(text, pat.getPattern(), sa, false, false,true).getAnnotations();
 			if(subMatches.isPresent()){
 				for(LinkedList<TextAnnotation> matchSequence:subMatches.get()){
-					//System.out.println("--"+ah.getNestingLevel()+" that pattern ("+pat+") matches with the sequence: "+matchSequence);
+					JSONObject annotation=pat.getResultingAnnotation(text,matchSequence);
+					//System.out.println("--+"+ah.getNestingLevel()+" that pattern ("+pat+") matches with the sequence: "+matchSequence+(annotation==null?"":" annotation: "+annotation.toString()));
 					//there's a match, let's annotate it
-					ah.addAnnotation(new Span(matchSequence.getFirst().getSpan().getStart(),matchSequence.getLast().getSpan().getEnd()), pat.getResultingAnnotation(text,matchSequence));
+					ah.addAnnotation(new Span(matchSequence.getFirst().getSpan().getStart(),matchSequence.getLast().getSpan().getEnd()),annotation );
 				}
 			}
 		});

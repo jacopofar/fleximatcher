@@ -32,7 +32,7 @@ public class TagRuleFactory implements RuleFactory {
 	}
 
 	public int getMaximumNesting() {
-		return 6;
+		return 1;
 	}
 
 	/**
