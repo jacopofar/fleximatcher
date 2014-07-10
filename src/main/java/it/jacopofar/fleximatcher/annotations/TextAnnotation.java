@@ -26,13 +26,15 @@ public final class TextAnnotation {
 	}
 
 	public int hashCode(){
-		return span.hashCode()+type.hashCode()+(json==null?0:11*json.hashCode());
+		//for now, tostring() due to some troubles in the JSONObject hashCode()
+		return span.hashCode()+type.hashCode()+(json==null?0:11*json.toString().hashCode());
 	}
 
 	public boolean equals(Object o){
 		if(!(o instanceof TextAnnotation))
 			return false;
-		return (json==null?(((TextAnnotation)o).json==null):((TextAnnotation)o).json.equals(json))
+		//for now, tostring() due to some troubles in the JSONObject equals()
+		return (json==null?(((TextAnnotation)o).json==null):((TextAnnotation)o).json.toString().equals(json.toString()))
 				&& ((TextAnnotation)o).span.equals(span)
 				&& ((TextAnnotation)o).type.equals(type);
 	}
