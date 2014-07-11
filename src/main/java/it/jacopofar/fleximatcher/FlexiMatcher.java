@@ -77,8 +77,17 @@ public class FlexiMatcher {
 		return ah.checkAnnotationSequence(ruleParts, text.length(),matchWhole,populateResult);
 	}
 
+	/**
+	 * Check whether the pattern matches the text
+	 * */
 	public boolean matches(String text,String pattern){
 		return matches(text,pattern, new DefaultAnnotationHandler(),false,true,false).isMatching();
+	}
+	/**
+	 * Check whether the pattern is contained in the text. That is, it matches with a substring of it
+	 * */
+	public boolean contains(String text,String pattern){
+		return matches(text,pattern, new DefaultAnnotationHandler(),false,false,false).isMatching();
 	}
 
 	public FlexiMatcher(){

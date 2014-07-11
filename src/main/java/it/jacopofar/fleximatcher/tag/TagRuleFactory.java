@@ -45,6 +45,8 @@ public class TagRuleFactory implements RuleFactory {
 	 * If the identifier is null, it will be added and will always return false
 	 * */
 	public boolean addTagRule(String tag, String pattern, String identifier, String annotationTemplate) {
+		if(pattern.equals("[tag:"+tag+"]"))
+			throw new RuntimeException();
 		if(rules.containsKey(tag)){
 			boolean removed=false;
 			if(identifier!=null)
