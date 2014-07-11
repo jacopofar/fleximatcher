@@ -3,6 +3,7 @@ package it.jacopofar.fleximatcher.annotations;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Class representing the results of a match. There are three cases:
@@ -62,7 +63,8 @@ public class MatchingResults {
 	}
 	
 	/**
-	 * Shows how each match was obtained and with which annotations
+	 * Shows how each match was obtained and with which annotations, in a human readable form
+	 * @param the text to annotate (usually the one you used to match the pattern)
 	 * */
 	public String[] getHighlightedStrings(String string) {
 		if(annotationsSequences==null)
@@ -77,6 +79,13 @@ public class MatchingResults {
 			res[i++]=highl;
 		}
 		return  res;
+	}
+	/**
+	 * Return a stream of all of the annotations in this
+	 * */
+	public Stream<TextAnnotation> getFlatAnnotations() {
+		return annotationsSequences.stream().flatMap(k->k.stream());
+		
 	}
 
 
