@@ -110,20 +110,22 @@ public class TestBasic {
 		assertTrue("contains 'an apple'",matched.contains("an apple"));
 		
 		assertTrue(fm.addTagRule("fruit", "apple", "id_apple","{'fruit':'apple'}"));
-		assertTrue(fm.addTagRule("fruit", "an [tag:fruit]", "id_an_fruit","{'fruit':'#1#'}"));
+		assertTrue(fm.addTagRule("fruit", "an [tag:fruit]", "id_an_fruit","{'internal_fruit':#1.fruit#,'article':'an'}"));
 		assertTrue(fm.addTagRule("fruit", "pear", "id_pear","{'fruit':'pear'}"));
-		assertFalse(fm.addTagRule("fruit", "a [tag:fruit]", "id_a_fruit","{'fruit':'#1#'}"));
+		assertFalse(fm.addTagRule("fruit", "a [tag:fruit]", "id_a_fruit","{'internal_fruit':#1.fruit#,'article':#0#}"));
 		
 		ah = new DefaultAnnotationHandler();
 		res = fm.matches(multiple, "[tag:fruit]",ah, true,false,true);
-		
 		matched = Arrays.asList(res.getMatchingStrings(multiple));
-		//matched = Arrays.asList(res.getHighlightedStrings(multiple));
 		assertEquals("number of annotations at top level",4,res.getAnnotations().get().size(),0.0);
 		assertTrue("contains 'apple'",matched.contains("apple"));
 		assertTrue("contains 'pear'",matched.contains("pear"));
 		assertTrue("contains 'an apple'",matched.contains("an apple"));
 		
+		assertTrue(res.getFlatAnnotations().anyMatch(
+				p->p.getJSON()==null?false:p.getJSON().get().optString("internal_fruit").equals("apple")));
+		assertTrue(res.getFlatAnnotations().anyMatch(
+				p->p.getJSON()==null?false:p.getJSON().get().optString("internal_fruit").equals("pear")));
 		
 	}
 }
