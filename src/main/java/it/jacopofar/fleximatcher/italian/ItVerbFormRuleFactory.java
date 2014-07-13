@@ -27,6 +27,9 @@ public class ItVerbFormRuleFactory implements RuleFactory {
 			e.printStackTrace();
 		}
 	}
+	public ItVerbFormRuleFactory(ItalianModel im2) {
+		this.im=im2;
+	}
 	@Override
 	public MatchingRule getRule(String parameter) {
 		try {

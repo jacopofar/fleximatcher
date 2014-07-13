@@ -16,7 +16,6 @@ import org.json.JSONObject;
 public class DefaultAnnotationHandler extends AnnotationHandler {
 	private ConcurrentHashMap<Integer,Set<TextAnnotation>> annotationsStored =new ConcurrentHashMap<Integer,Set<TextAnnotation>>();
 	private int numAnnotations;
-	private final HashSet<TextAnnotation> added=new HashSet<TextAnnotation>();
 	@Override
 	public void addAnnotation(Span span, JSONObject attributes) {
 
@@ -26,7 +25,6 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 		}
 		TextAnnotation ta = new TextAnnotation(span,currentMatcher,attributes);
 		annotationsStored.get(span.getStart()).add(ta);
-		added.add(ta);
 	}
 	@Override
 	public void addAnnotationFromSubHandler(Span span, JSONObject attributes) {
@@ -51,7 +49,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 		 * The method is very simple:
 		 * the startPosition set contains the starting points (initially just 0, or any possible position for matchWhole=false)
 		 * Iterate on the rules to match and look for ones that start frome one of the starting position
-		 * for each of them add athe ending positions to a new set of positions
+		 * for each of them add at the ending positions to a new set of positions
 		 * if this new set stays empty, return false
 		 * if this set has some element, swap it with the startint positions set and go to the next rule
 		 * 
@@ -123,10 +121,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 	public Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream() {
 		return annotationsStored.entrySet().stream();
 	}
-	@Override
-	public Stream<TextAnnotation> getAnnotationsAtThisLevelStream() {
-		return added.stream();
-	}
+	
 	@Override
 	public AnnotationHandler getSubHandler(String newCurrentMatcher) {
 		return new DefaultSubHandler(this,newCurrentMatcher);

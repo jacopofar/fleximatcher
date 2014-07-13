@@ -48,10 +48,12 @@ public abstract class AnnotationHandler {
 	/**
 	 * Check whether exist a sequence of contiguous annotations with the given tag covering the whole length of the string and returns the corresponding annotations if required.
 	 * This is a sequence of annotations with the following characteristics:
-	 * 1. Their getType() values are exactly the values contained in ruleParts, in the same order
-	 * 2. The span of an element ends exactly where the next one starts
-	 * 3. The first element span starts at 0, the last element span ends at length (if matchWhole is true)
-	 * @param matchWhole false if the sequence can not cover the whole string (that is, the rukle 3 is not applied)
+	 * <ol>
+	 * <li>Their getType() values are exactly the values contained in ruleParts, in the same order</li>
+	 * <li>The span of an element ends exactly where the next one starts</li>
+	 * <li>The first element span starts at 0, the last element span ends at length (if matchWhole is true)</li>
+	 * </ol>
+	 * @param matchWhole false if the sequence can not cover the whole string (that is, the rule 3 is not applied)
 	 * @param rulePars an array of expected rules
 	 * @lenth the length of the text to match, which will be the end of the last span
 	 * @param populateResult whether ot not populate the resulting object with the sequences. If those are not necessary, a fair amoutn of calculation can be avoided
@@ -69,10 +71,7 @@ public abstract class AnnotationHandler {
 	 * 
 	 * */
 	public abstract Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream();
-	/**
-	 * Return a stream of annotations added at this level, that is, not in subhandlers
-	 * */
-	public abstract Stream<TextAnnotation> getAnnotationsAtThisLevelStream();
+
 	/**
 	 * Return the nesting level of this AnnotationHandler, that is, the number of subhandlers levels
 	 * The root AnnotationHandler is at level 0, a subhandler has level 1, the a subhandler obtained from it has level 2, and so on.

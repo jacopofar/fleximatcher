@@ -55,7 +55,7 @@ public class TestBasic {
 		assertFalse(fm.matches("AbC", "ABC"));
 		ResultPrintingAnnotationHandler ah = new ResultPrintingAnnotationHandler("AbC");
 		assertTrue("nested multi",fm.matches("AbC", "A[multi:[r:[bD]+][i:B][multi:b]]C",ah, true,true,true).isMatching());
-		assertEquals("number of annotations at top level",3.0,ah.getAnnotationsAtThisLevelStream().count(),0.0);
+		assertEquals("number of annotations:",8.0,ah.getAnnotationsCount(),0.0);
 
 	}
 

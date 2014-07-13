@@ -27,6 +27,9 @@ public class ItSpecificVerbRuleFactory implements RuleFactory {
 			e.printStackTrace();
 		}
 	}
+	public ItSpecificVerbRuleFactory(ItalianModel im2) {
+		this.im=im2;
+	}
 	@Override
 	public MatchingRule getRule(String parameter) {
 		try {

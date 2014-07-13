@@ -21,6 +21,9 @@ public class ItPosRuleFactory implements RuleFactory {
 			e.printStackTrace();
 		}
 	}
+	public ItPosRuleFactory(ItalianModel im2) {
+		this.im=im2;
+	}
 	public MatchingRule getRule(String parameter) {
 		return new ItPosRule(im,parameter);
 	}

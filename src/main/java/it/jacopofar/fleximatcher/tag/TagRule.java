@@ -28,7 +28,7 @@ public class TagRule extends MatchingRule {
 
 	@Override
 	public boolean annotate(String text, AnnotationHandler ah) {
-		//System.out.println("--"+ah.getNestingLevel()+" TAGRULE: asked to annotate '"+text+"', I'm the rule "+name);
+		//System.out.println("--"+ah.getNestingLevel()+" TAG RULE: asked to annotate '"+text+"', I'm the rule "+name);
 		if(ah.getNestingLevel()>ruleFactory.getMaximumNesting())
 			return false;
 

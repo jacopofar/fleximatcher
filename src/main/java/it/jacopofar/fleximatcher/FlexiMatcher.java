@@ -58,6 +58,8 @@ public class FlexiMatcher {
 				ruleset[i++]=new PlainTextRule(s);
 			}
 			else{
+				if(!rules.containsKey(ExpressionParser.ruleName(s)))
+					throw new RuntimeException("Error, the rule '"+ExpressionParser.ruleName(s)+"' is unknown, check it was bound and the pattern is written correctly");
 				ruleset[i++]=rules.get(ExpressionParser.ruleName(s)).getRule(ExpressionParser.getParameter(s));
 			}
 		}
@@ -81,13 +83,13 @@ public class FlexiMatcher {
 	 * Check whether the pattern matches the text
 	 * */
 	public boolean matches(String text,String pattern){
-		return matches(text,pattern, new DefaultAnnotationHandler(),false,true,false).isMatching();
+		return matches(text,pattern,getDefaultAnnotator(),false,true,false).isMatching();
 	}
 	/**
 	 * Check whether the pattern is contained in the text. That is, it matches with a substring of it
 	 * */
 	public boolean contains(String text,String pattern){
-		return matches(text,pattern, new DefaultAnnotationHandler(),false,false,false).isMatching();
+		return matches(text,pattern, getDefaultAnnotator(),false,false,false).isMatching();
 	}
 
 	public FlexiMatcher(){
@@ -147,5 +149,10 @@ public class FlexiMatcher {
 	public boolean removeTagRule(String tag,String identifier) {
 		return factory.removeTagRule(tag,identifier);
 		
+	}
+
+
+	public static AnnotationHandler getDefaultAnnotator() {
+		return new DefaultAnnotationHandler();
 	}
 }

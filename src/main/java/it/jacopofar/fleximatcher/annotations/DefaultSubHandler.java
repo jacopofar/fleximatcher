@@ -57,11 +57,6 @@ public class DefaultSubHandler extends AnnotationHandler {
 	}
 
 	@Override
-	public Stream<TextAnnotation> getAnnotationsAtThisLevelStream() {
-		return addedSub.stream();
-	}
-
-	@Override
 	public AnnotationHandler getSubHandler(String newCurrentMatcher) {
 		return new DefaultSubHandler(this,newCurrentMatcher);
 	}
