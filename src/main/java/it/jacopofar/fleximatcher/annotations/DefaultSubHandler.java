@@ -1,19 +1,17 @@
 package it.jacopofar.fleximatcher.annotations;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import org.json.JSONObject;
-
 import opennlp.tools.util.Span;
+
+import org.json.JSONObject;
 
 
 public class DefaultSubHandler extends AnnotationHandler {
 
 	private AnnotationHandler wrappedHandler;
-	private final HashSet<TextAnnotation> addedSub=new HashSet<TextAnnotation>();
 	private int nestingLevel;
 	public DefaultSubHandler(AnnotationHandler annotationHandler,
 			String currentMatcher) {
@@ -24,7 +22,6 @@ public class DefaultSubHandler extends AnnotationHandler {
 
 	@Override
 	public void addAnnotation(Span span, JSONObject attributes) {
-		addedSub.add(new TextAnnotation(span, currentMatcher, attributes));
 		synchronized(wrappedHandler){
 			String beforeMatcher=wrappedHandler.getCurrentMatcher();
 			wrappedHandler.setCurrentMatcher(currentMatcher);
