@@ -15,25 +15,22 @@ import org.json.JSONObject;
 
 public class DefaultAnnotationHandler extends AnnotationHandler {
 	private ConcurrentHashMap<Integer,Set<TextAnnotation>> annotationsStored =new ConcurrentHashMap<Integer,Set<TextAnnotation>>();
+	private ConcurrentHashMap<String,Set<TextAnnotation>> annotationsForTag =new ConcurrentHashMap<String,Set<TextAnnotation>>();
 	private int numAnnotations;
 	@Override
 	public void addAnnotation(Span span, JSONObject attributes) {
-
 		numAnnotations++;
 		if(!annotationsStored.containsKey(span.getStart())){
 			annotationsStored.put(span.getStart(), new HashSet<TextAnnotation>());
 		}
 		TextAnnotation ta = new TextAnnotation(span,currentMatcher,attributes);
 		annotationsStored.get(span.getStart()).add(ta);
+		if(!annotationsForTag.contains(currentMatcher))
+			annotationsForTag.put(currentMatcher, new HashSet<TextAnnotation>());
+		annotationsForTag.get(currentMatcher).add(ta);
+
 	}
-	@Override
-	public void addAnnotationFromSubHandler(Span span, JSONObject attributes) {
-		numAnnotations++;
-		if(!annotationsStored.containsKey(span.getStart())){
-			annotationsStored.put(span.getStart(), new HashSet<TextAnnotation>());
-		}
-		annotationsStored.get(span.getStart()).add(new TextAnnotation(span,currentMatcher,attributes));
-	}
+	
 	@Override
 	public int getAnnotationsCount() {
 		return numAnnotations;
@@ -121,7 +118,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 	public Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream() {
 		return annotationsStored.entrySet().stream();
 	}
-	
+
 	@Override
 	public AnnotationHandler getSubHandler(String newCurrentMatcher) {
 		return new DefaultSubHandler(this,newCurrentMatcher);

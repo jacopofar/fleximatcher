@@ -25,19 +25,11 @@ public class DefaultSubHandler extends AnnotationHandler {
 		synchronized(wrappedHandler){
 			String beforeMatcher=wrappedHandler.getCurrentMatcher();
 			wrappedHandler.setCurrentMatcher(currentMatcher);
-			wrappedHandler.addAnnotationFromSubHandler(span, attributes);
+			wrappedHandler.addAnnotation(span, attributes);
 			wrappedHandler.setCurrentMatcher(beforeMatcher);
 		}
 	}
-	@Override
-	public void addAnnotationFromSubHandler(Span span, JSONObject attributes) {
-		synchronized(wrappedHandler){
-			String beforeMatcher=wrappedHandler.getCurrentMatcher();
-			wrappedHandler.setCurrentMatcher(currentMatcher);
-			wrappedHandler.addAnnotationFromSubHandler(span, attributes);
-			wrappedHandler.setCurrentMatcher(beforeMatcher);
-		}
-	}
+
 	@Override
 	public int getAnnotationsCount() {
 		return wrappedHandler.getAnnotationsCount();

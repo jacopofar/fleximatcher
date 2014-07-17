@@ -31,8 +31,8 @@ public class TagRule extends MatchingRule {
 		//System.out.println("--"+ah.getNestingLevel()+" TAG RULE: asked to annotate '"+text+"', I'm the rule "+name);
 		if(ah.getNestingLevel()>ruleFactory.getMaximumNesting())
 			return false;
-
 		ruleFactory.getTagPatterns(name).forEach(pat->{
+			
 			//System.out.println("--"+ah.getNestingLevel()+" about to try pattern: "+pat);
 			AnnotationHandler sa = ah.getSubHandler(pat.getPattern());
 			Optional<Set<LinkedList<TextAnnotation>>> subMatches = ruleFactory.getMatcher().matches(text, pat.getPattern(), sa, false, false,true).getAnnotations();

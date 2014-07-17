@@ -22,8 +22,6 @@ public class MultiRule extends MatchingRule {
 		this.fm=fm;
 	}
 
-
-
 	@Override
 	public boolean annotate(String text, AnnotationHandler ah) {
 		boolean matchAll=true;

@@ -70,27 +70,32 @@ public class RuleDefinition {
 				String content=JSONObject.quote(matchSequence.get(Integer.parseInt(expr)).getSpan().getCoveredText(text).toString());
 				result=result.replace(m.group(), content);
 			}
-			if(expr.matches("[1-9][0-9]*\\..+")){
-				String content;
-				int position=Integer.parseInt(expr.replaceAll("\\..+", ""));
-				try {
-					content = matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")).toString();
-				} catch (JSONException e) {
-					e.printStackTrace();
-					throw new RuntimeException("error while creating the annotation");
+			else
+				if(expr.matches("[0-9]+\\..+")){
+					String content;
+					int position=Integer.parseInt(expr.replaceAll("\\..+", ""));
+					try {
+						content = JSONObject.quote(matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")).toString());
+					} catch (JSONException e) {
+						e.printStackTrace();
+						throw new RuntimeException("error while creating the annotation for "+expr.replaceAll("[0-9]+\\.", ""));
+					}
+					//if the content is empty, explicitly use an empty string
+					if(content.isEmpty())
+						result=result.replace(m.group(), "''");
+					else
+						result=result.replace(m.group(), content);
 				}
-				result=result.replace(m.group(), content);
-			}
 		}
-//		for(int i=0;i<matchSequence.size();i++){
-//			String c=JSONObject.quote(matchSequence.get(i).getSpan().getCoveredText(text).toString());
-//			result=result.replace("#"+i+"#", c.substring(1,c.length()-1));
-//		}
+		//		for(int i=0;i<matchSequence.size();i++){
+		//			String c=JSONObject.quote(matchSequence.get(i).getSpan().getCoveredText(text).toString());
+		//			result=result.replace("#"+i+"#", c.substring(1,c.length()-1));
+		//		}
 		try {
 			return new JSONObject(result);
 		} catch (JSONException e) {
 			e.printStackTrace();
-			throw new RuntimeException("error while creating the annotation");
+			throw new RuntimeException("error while creating the annotation for "+result);
 		}
 	}
 

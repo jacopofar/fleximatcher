@@ -78,9 +78,5 @@ public abstract class AnnotationHandler {
 	 * */
 	public abstract int getNestingLevel();
 	
-	/**
-	 * Store an annotation from a subhandler, it will not be among the ones retrieved by getAnnotationsAtThisLevelStream()
-	 * */
-	public abstract void addAnnotationFromSubHandler(Span span, JSONObject attributes);
 
 }

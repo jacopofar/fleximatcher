@@ -1,5 +1,7 @@
 package it.jacopofar.fleximatcher.italian;
 
+import java.util.HashSet;
+
 import it.jacopofar.fleximatcher.annotations.AnnotationHandler;
 import it.jacopofar.fleximatcher.rules.MatchingRule;
 import opennlp.tools.util.Span;
@@ -13,33 +15,39 @@ import com.github.jacopofar.italib.postagger.POSUtils;
 public class ItPosRule extends MatchingRule {
 
 	private ItalianModel im;
-	private String tag;
+	private HashSet<String> acceptedTags;
 
 	public ItPosRule(ItalianModel im, String tag) {
 		this.im=im;
-		if(!tag.matches("[A-Za-z0-9_]+"))
-			throw new RuntimeException("tag "+tag+" not valid, must contain only letters, digits and underscores");
-		if(POSUtils.getDescription(tag).equals("UNKNOWN TAG"))
+		if(tag.isEmpty())
+			throw new RuntimeException("tag not valid, mustn't be empty");
+		acceptedTags=new HashSet<String>();
+		for(String candidateTag:POSUtils.getPossibleTags()){
+			if(candidateTag.matches(tag))
+				acceptedTags.add(candidateTag);
+				
+		}
+		
+		if(acceptedTags.size()==0)
 			throw new RuntimeException("tag "+tag+" not recognized");
-		this.tag=tag;
 	}
 
 	@Override
 	public boolean annotate(String text,AnnotationHandler ah) {
 		Span[] tags = im.getPosTags(text);
 		if(tags.length==1){
-			if(tags[0].length()==text.length() && tags[0].getType().equals(tag))
+			if(tags[0].length()==text.length() && acceptedTags.contains(tags[0].getType()))
 				try {
-					ah.addAnnotation(tags[0],new JSONObject("{'tag':'"+tag+"'}"));
+					ah.addAnnotation(tags[0],new JSONObject("{'tag':'"+tags[0].getType()+"'}"));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 		}
 
 		for(Span t:tags){
-			if(t.getType().equals(tag))
+			if(acceptedTags.contains(t.getType()))
 				try {
-					ah.addAnnotation(t,new JSONObject("{'tag':'"+tag+"'}"));
+					ah.addAnnotation(t,new JSONObject("{'tag':'"+t.getType()+"'}"));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -49,6 +57,6 @@ public class ItPosRule extends MatchingRule {
 
 	@Override
 	public String toString() {
-		return "matches the italian POS tag "+tag+" ("+POSUtils.getDescription(tag)+")";
+		return "matches the italian POS tags "+acceptedTags.toString();
 	}
 }
