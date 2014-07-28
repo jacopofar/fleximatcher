@@ -151,8 +151,18 @@ public class FlexiMatcher {
 		
 	}
 
-
 	public static AnnotationHandler getDefaultAnnotator() {
 		return new DefaultAnnotationHandler();
+	}
+
+
+	public boolean isBoundRule(String ruleName) {
+		return rules.containsKey(ruleName);
+	}
+
+
+	public void clearTags() {
+		factory.clearRules();
+		
 	}
 }

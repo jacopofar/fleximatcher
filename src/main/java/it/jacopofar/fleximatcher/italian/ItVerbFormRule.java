@@ -30,7 +30,7 @@ public class ItVerbFormRule extends MatchingRule {
 	public boolean annotate(String text, AnnotationHandler ah) {
 		boolean complete=false;
 		for(Span token:im.getTokens(text)){
-			Set<ItalianVerbConjugation> possibleVerbs = im.getVerbs(token.getCoveredText(text).toString(), true);
+			Set<ItalianVerbConjugation> possibleVerbs = im.getVerbs(token.getCoveredText(text).toString(), false);
 			for(ItalianVerbConjugation v:possibleVerbs){
 				try {
 					if(params.has("mode") && !v.getMode().equals(params.getString("mode")))
@@ -42,7 +42,7 @@ public class ItVerbFormRule extends MatchingRule {
 					ah.addAnnotation(token, new JSONObject(v.toJSON()));
 				} catch (JSONException e) {
 					e.printStackTrace();
-					throw new RuntimeException("JSON format error");
+					throw new RuntimeException("verb form format error: "+e.getMessage());
 				}
 				if(token.length()==text.length())
 					complete=true;

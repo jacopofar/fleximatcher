@@ -42,7 +42,7 @@ public class MatchingResults {
 	}
 
 	public static MatchingResults matchWithAnnotations(Set<LinkedList<TextAnnotation>> results) {
-		return new MatchingResults(true,true,results);
+		return new MatchingResults(true,false,results);
 	}
 	public Optional<Set<LinkedList<TextAnnotation>>> getAnnotations(){
 		return Optional.ofNullable(this.annotationsSequences);

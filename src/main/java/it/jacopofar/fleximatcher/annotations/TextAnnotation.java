@@ -66,4 +66,8 @@ public final class TextAnnotation {
 	public int startPosition() {
 		return span.getStart();
 	}
+
+	public String toJSON() {
+		return "{'type':"+JSONObject.quote(type)+",span_start:"+span.getStart()+",span_end:"+span.getEnd()+ (json==null?"":",annotation:"+json.toString())+"}";
+	}
 }

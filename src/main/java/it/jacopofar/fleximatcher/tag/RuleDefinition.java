@@ -24,7 +24,6 @@ public class RuleDefinition {
 			if(annotationExpression!=null)
 				new JSONObject(annotationExpression.replaceAll("#([0-9]+[^#]*)#", "''"));
 		} catch (JSONException e) {
-			e.printStackTrace();
 			throw new RuntimeException("Error, the string '"+annotationExpression+"' is not a valid JSON string!");
 		}
 		this.pattern=pattern;

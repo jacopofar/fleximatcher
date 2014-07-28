@@ -2,6 +2,7 @@ package it.jacopofar.fleximatcher.italian;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONException;
 
@@ -13,6 +14,7 @@ import it.jacopofar.fleximatcher.rules.MatchingRule;
 public class ItSpecificVerbRuleFactory implements RuleFactory {
 
 	private ItalianModel im;
+	private ConcurrentHashMap<String,ItSpecificVerbRule> cache= new  ConcurrentHashMap<String,ItSpecificVerbRule>(100);
 	public ItSpecificVerbRuleFactory(){
 		try {
 			im = new ItalianModel();
@@ -32,8 +34,14 @@ public class ItSpecificVerbRuleFactory implements RuleFactory {
 	}
 	@Override
 	public MatchingRule getRule(String parameter) {
+		if(cache.containsKey(parameter))
+			return cache.get(parameter);
 		try {
-			return new ItSpecificVerbRule(im,parameter);
+			ItSpecificVerbRule v = new ItSpecificVerbRule(im,parameter);
+			if(cache.size()>100)
+				cache.clear();
+			cache.put(parameter, v);
+			return v; 
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}

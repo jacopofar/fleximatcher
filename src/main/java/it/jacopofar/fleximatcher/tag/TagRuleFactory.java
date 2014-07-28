@@ -77,4 +77,8 @@ public class TagRuleFactory implements RuleFactory {
 		return rules.get(tag).removeIf(p->p.getIdentifier().equals(identifier));
 	}
 
+	public void clearRules() {
+		rules.clear();
+	}
+
 }

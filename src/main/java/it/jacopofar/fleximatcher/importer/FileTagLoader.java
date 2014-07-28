@@ -34,7 +34,7 @@ public class FileTagLoader {
 		while(it.hasNext()){
 			lineNum++;
 			String[] line=it.next().split("\t");
-			if(line[0].startsWith("#"))
+			if(line[0].startsWith("#") || line[0].isEmpty())
 				continue;
 			switch(line.length){
 			case 2:
@@ -51,7 +51,7 @@ public class FileTagLoader {
 
 			}
 			if(line.length==2)
-				inserted+=fm.addTagRule(line[0], line[2], line[1])?0:1;
+				inserted+=fm.addTagRule(line[0], line[1], datasetName+"_"+lineNum)?0:1;
 			else
 				if(line.length==4)
 					inserted+=fm.addTagRule(line[0], line[2], line[1],line[3])?0:1;
