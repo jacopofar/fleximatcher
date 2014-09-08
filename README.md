@@ -14,7 +14,9 @@ Given a pattern string and a text string, Fleximatcher can:
 Fleximatcher is made to be used as a library and embedded in applications, but a separate applications called fleximatcher web interface is available to expose a JSON interface and a web page to quickly check how patterns match with texts and which annotations they produce.
 
 By itself, Fleximatcher is language agnostic and has no NLP capabilities out of the box, but you can map other libraries with pattern elements in a few lines to use them.
-A mapping with Italian NLP components (PoS tagging, tokenizer and verb conjugations) is available <!--- TODO: add and describe english one -->
+A mapping with Italian NLP components (PoS tagging, tokenizer and verb conjugations) is available
+
+[//]: #TODO: add and describe english rules
 
 Fleximatcher patterns are made of rules and plain text. Rules are called using square brackets and possibly passing a string parameter. For example:
 
@@ -51,7 +53,9 @@ then match the string "I like [tag:animals]" to match "I like cats". Tags can be
 
 animals=>the [tag:animals]
 
-and match "I like the dogs". Tag mappings are rules of a generative grammar, and there's no need to normalize them. Fleximatcher will use a maximum depth of recursion (by default 5, can be changed at runtime using setMaximumTagNesting method) to avoid infinite loops, that means that if you have to use very complex tags rules you'll have to increase the maximum allowed depth or rewrite them, otherwise the library could stop the parsing. <!---TODO: lanciare eccezione per massima profondità raggiunta?-->
+and match "I like the dogs". Tag mappings are rules of a generative grammar, and there's no need to normalize them. Fleximatcher will use a maximum depth of recursion (by default 5, can be changed at runtime using setMaximumTagNesting method) to avoid infinite loops, that means that if you have to use very complex tags rules you'll have to increase the maximum allowed depth or rewrite them, otherwise the library could stop the parsing.
+
+[//]: #TODO: lanciare eccezione per massima profondità raggiunta?
 
 How to use it
 =============
@@ -68,8 +72,9 @@ the library is thread safe and can parse many strings in parallel, tags and rule
 Define new tags
 --------------
 
-You can define a new tag by calling the method addTag <!--- TODO: vedere i nomi e le varianti, descriverli brevemente spiegando i metodi per le annotazioni)
-(TODO: esempio dei nick -->
+You can define a new tag by calling the method addTag
+[//]: #TODO: vedere i nomi e le varianti, descriverli brevemente spiegando i metodi per le annotazioni)
+[//]: #TODO:  esempio dei nick
 
 Define new rules
 ---------------
