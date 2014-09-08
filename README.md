@@ -14,7 +14,7 @@ Given a pattern string and a text string, Fleximatcher can:
 Fleximatcher is made to be used as a library and embedded in applications, but a separate applications called fleximatcher web interface is available to expose a JSON interface and a web page to quickly check how patterns match with texts and which annotations they produce.
 
 By itself, Fleximatcher is language agnostic and has no NLP capabilities out of the box, but you can map other libraries with pattern elements in a few lines to use them.
-A mapping with Italian NLP components (PoS tagging, tokenizer and verb conjugations) is available (TODO: aggiungere quello per l'inglese prima di pubblicizzare)
+A mapping with Italian NLP components (PoS tagging, tokenizer and verb conjugations) is available <!--- TODO: add and describe english one -->
 
 Fleximatcher patterns are made of rules and plain text. Rules are called using square brackets and possibly passing a string parameter. For example:
 
@@ -51,7 +51,7 @@ then match the string "I like [tag:animals]" to match "I like cats". Tags can be
 
 animals=>the [tag:animals]
 
-and match "I like the dogs". Tag mappings are rules of a generative grammar, and there's no need to normalize them. Fleximatcher will use a maximum depth of recursion (by default 5, can be changed at runtime using setMaximumTagNesting method) to avoid infinite loops, that means that if you have to use very complex tags rules you'll have to increase the maximum allowed depth or rewrite them, otherwise the library could stop the parsing. (TODO: lanciare eccezione per massima profondità raggiunta?)
+and match "I like the dogs". Tag mappings are rules of a generative grammar, and there's no need to normalize them. Fleximatcher will use a maximum depth of recursion (by default 5, can be changed at runtime using setMaximumTagNesting method) to avoid infinite loops, that means that if you have to use very complex tags rules you'll have to increase the maximum allowed depth or rewrite them, otherwise the library could stop the parsing. <!---TODO: lanciare eccezione per massima profondità raggiunta?-->
 
 How to use it
 =============
@@ -68,8 +68,8 @@ the library is thread safe and can parse many strings in parallel, tags and rule
 Define new tags
 --------------
 
-You can define a new tag by calling the method addTag (TODO: vedere i nomi e le varianti, descriverli brevemente spiegando i metodi per le annotazioni)
-(TODO: esempio dei nick)
+You can define a new tag by calling the method addTag <!--- TODO: vedere i nomi e le varianti, descriverli brevemente spiegando i metodi per le annotazioni)
+(TODO: esempio dei nick -->
 
 Define new rules
 ---------------
@@ -172,18 +172,20 @@ Rules must be thread safe, or strange, nasty, errors may happen when parsing a t
 Retrieve the results
 ---------------------
 the most flexile method used to match patterns against a text is this:
-	/**
-		 * Matches the text against the given pattern, using the given annotator
-		 * @param text the string to match (e.g.: "the dog")
-		 * @param pattern the pattern to search for (e.g. "the [r:[a-z]+]")
-		 * @param ah the AnnotationHandler which will be used to store annotations
-		 * @param fullyAnnotate if true, will give the annotation handler any annotation found, if false will stop as soon as is sure that the string doesn't match
-		 * @param matchWhole if true, will match the pattern against the whole text, if false will search for a substring matching it.
-		 * @param populateResult if true, will populate the results, if false it will only check whether there is a match or not.
-		 * The difference between fullyAnnotate and populateResult is that the former can stop the annotation process, the latter stops the generation of the results but let the annotation handler receive the annotations found.
-		 * @return a MatchingResults reporting whether there was a match or not and, when requested, the annotations and 
-		 * */
-		public MatchingResults matches(String text,String pattern, AnnotationHandler ah, boolean fullyAnnotate,boolean matchWhole,boolean populateResult){
+
+
+		/**
+			 * Matches the text against the given pattern, using the given annotator
+			 * @param text the string to match (e.g.: "the dog")
+			 * @param pattern the pattern to search for (e.g. "the [r:[a-z]+]")
+			 * @param ah the AnnotationHandler which will be used to store annotations
+			 * @param fullyAnnotate if true, will give the annotation handler any annotation found, if false will stop as soon as is sure that the string doesn't match
+			 * @param matchWhole if true, will match the pattern against the whole text, if false will search for a substring matching it.
+			 * @param populateResult if true, will populate the results, if false it will only check whether there is a match or not.
+			 * The difference between fullyAnnotate and populateResult is that the former can stop the annotation process, the latter stops the generation of the results but let the annotation handler receive the annotations found.
+			 * @return a MatchingResults reporting whether there was a match or not and, when requested, the annotations and 
+			 * */
+			public MatchingResults matches(String text,String pattern, AnnotationHandler ah, boolean fullyAnnotate,boolean matchWhole,boolean populateResult){
 
 The JavaDoc description should be clear, the difference between _fullyAnnotate_ and _populateResult_ is that the first one is applied during the annotation process, and will not annotate completely the text with the annotation handler in case it surely doesn't match. The second one is applied when populating results, and will annotate the text without returning the results. The difference is important when you want to use a custom annotation handler and retrieve all the annotations or some statistics about them.
 
