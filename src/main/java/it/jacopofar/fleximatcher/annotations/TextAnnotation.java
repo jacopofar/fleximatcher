@@ -68,6 +68,6 @@ public final class TextAnnotation {
 	}
 
 	public String toJSON() {
-		return "{'type':"+JSONObject.quote(type)+",span_start:"+span.getStart()+",span_end:"+span.getEnd()+ (json==null?"":",annotation:"+json.toString())+"}";
+		return "{\"type\":"+JSONObject.quote(type)+",\"span_start\":"+span.getStart()+",\"span_end\":"+span.getEnd()+ (json==null?"":",\"annotation\":"+json.toString())+"}";
 	}
 }

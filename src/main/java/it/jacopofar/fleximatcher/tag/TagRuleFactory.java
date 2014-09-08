@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 
 
 public class TagRuleFactory implements RuleFactory {
-
+    
+    private int maximumNesting=5;
 	private FlexiMatcher matcher;
 	private ConcurrentHashMap<String,HashSet<RuleDefinition>> rules=new ConcurrentHashMap<String,HashSet<RuleDefinition>>();
 	public TagRuleFactory(FlexiMatcher flexiMatcher) {
@@ -32,7 +33,7 @@ public class TagRuleFactory implements RuleFactory {
 	}
 
 	public int getMaximumNesting() {
-		return 1;
+		return maximumNesting;
 	}
 
 	/**
@@ -80,5 +81,9 @@ public class TagRuleFactory implements RuleFactory {
 	public void clearRules() {
 		rules.clear();
 	}
+
+    public void setMaximumNesting(int maxDepth) {
+        maximumNesting=maxDepth;
+    }
 
 }
