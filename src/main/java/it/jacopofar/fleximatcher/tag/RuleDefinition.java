@@ -11,8 +11,8 @@ import org.json.JSONObject;
 
 public class RuleDefinition {
 
-	private String pattern;
-	private String identifier;
+	private final String pattern;
+	private final String identifier;
 	private String annotationExpression;
 	public RuleDefinition(String pattern, String identifier) {
 		this.pattern=pattern;
@@ -20,9 +20,9 @@ public class RuleDefinition {
 	}
 	public RuleDefinition(String pattern, String identifier,String annotationExpression) {
 		try {
-			//check it now, will however be stored as a String
+			//check it now, it will be stored as a String but it's better to find issues early
 			if(annotationExpression!=null)
-				new JSONObject(annotationExpression.replaceAll("#([0-9]+[^#]*)#", "''"));
+				new JSONObject(annotationExpression.replaceAll("(#([0-9]+[^#]*)#)+", "''"));
 		} catch (JSONException e) {
 			throw new RuntimeException("Error, the string '"+annotationExpression+"' is not a valid JSON string!");
 		}
@@ -80,10 +80,11 @@ public class RuleDefinition {
 						throw new RuntimeException("error while creating the annotation for "+expr.replaceAll("[0-9]+\\.", ""));
 					}
 					//if the content is empty, explicitly use an empty string
+                                        //we could have patterns in the form #x##y#, that have been transformed in 'string1''string2', we have to remove the double quotes between them
 					if(content.isEmpty())
 						result=result.replace(m.group(), "''");
 					else
-						result=result.replace(m.group(), content);
+						result=result.replace(m.group(), content.replace("''", ""));
 				}
 		}
 		//		for(int i=0;i<matchSequence.size();i++){
