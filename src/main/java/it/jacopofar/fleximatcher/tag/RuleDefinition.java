@@ -77,14 +77,17 @@ public class RuleDefinition {
 						content = JSONObject.quote(matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")).toString());
 					} catch (JSONException e) {
 						e.printStackTrace();
-						throw new RuntimeException("error while creating the annotation for "+expr.replaceAll("[0-9]+\\.", ""));
+						throw new RuntimeException("---------error while creating the annotation for "+expr.replaceAll("[0-9]+\\.", ""));
 					}
 					//if the content is empty, explicitly use an empty string
                                         //we could have patterns in the form #x##y#, that have been transformed in 'string1''string2', we have to remove the double quotes between them
-					if(content.isEmpty())
+					//System.err.println("   pre:"+result);
+                                        if(content.isEmpty())
 						result=result.replace(m.group(), "''");
 					else
-						result=result.replace(m.group(), content.replace("''", ""));
+						result=result.replace(m.group(), content.replaceAll("([^:])\"\"([^,])", "$1$2").replaceAll("([^:])''([^,])", "$1$2"));
+                                      //  System.err.println("   post:"+result);
+                                       // System.err.println("   content was:"+content);
 				}
 		}
 		//		for(int i=0;i<matchSequence.size();i++){
@@ -92,10 +95,12 @@ public class RuleDefinition {
 		//			result=result.replace("#"+i+"#", c.substring(1,c.length()-1));
 		//		}
 		try {
+                    result=result.replaceAll("([^:])\"\"([^,])", "$1$2").replaceAll("([^:])''([^,])", "$1$2");
+                    result=result.replaceAll("([^:])\"\"([^,])", "$1$2").replaceAll("([^:])''([^,])", "$1$2");
 			return new JSONObject(result);
 		} catch (JSONException e) {
 			e.printStackTrace();
-			throw new RuntimeException("error while creating the annotation for "+result);
+			throw new RuntimeException("++++++++++error while creating the annotation for "+result);
 		}
 	}
 
