@@ -47,7 +47,7 @@ public class FileTagLoader {
 				inserted+=fm.addTagRule(line[0], line[1], line[2],line[3])?0:1;
 				break;
 			default:
-				throw new RuntimeException("Line "+lineNum +" with an invalid length of "+line.length+ " at "+datasetName);
+				throw new RuntimeException("Line "+lineNum +" with an invalid number of parts, "+line.length+ ", at "+datasetName);
 
 			}
 			if(line.length==2)
