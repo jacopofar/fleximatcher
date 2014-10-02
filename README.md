@@ -9,7 +9,7 @@ Given a pattern string and a text string, Fleximatcher can:
 * test whether the text contains a substring which matches the pattern
 * determine which parts of the string match the elements of the pattern, and specifically
   * in case of many possible interpretations, return all of them
-  * in case the pattern has annotations defined, returns them
+  * in case the pattern elements have additional annotations defined, return them
 * apply recursive patterns (that is, generative grammars)
 Fleximatcher is made to be used as a library and embedded in applications, but a separate applications called fleximatcher web interface is available to expose a JSON interface and a web page to quickly check how patterns match with texts and which annotations they produce.
 
@@ -145,7 +145,7 @@ A rule has to implement the getRule method, which given the parameter (in the pr
 
 A Rule has the method annotate which receives the text to annotate and an AnnotationHandler instance, and will use the annotation handler addAnnotation method to notify any match with the string, possibly with the corresponding annotations as JSON strings.
 
-Rules can also check the text against other rules. Let's assume we want to create a rule which matches adjectives related to Krapfen in German.
+Rules can also check the text against other rules. Let's assume we want to create a rule which matches adjectives related to the word Krapfen in German.
 In this rule we'll look for an adjective using the de-pos rule followed by the word "Krapfen".
 The annotate method of this rule will be:
 
@@ -178,7 +178,7 @@ Rules must be thread safe, or strange, nasty, errors may happen when parsing a t
 
 Retrieve the results
 ---------------------
-the most flexile method used to match patterns against a text is this:
+The most flexile method used to match patterns against a text is this:
 
 
 		/**
@@ -204,4 +204,4 @@ this will return true if the pattern matches the whole text exactly, using the d
 	contains(String text,String pattern)
 will return true if a substring of text matches the pattern. It works exactly like matches(String text,String pattern) but will match strings containing a match.
 
-__NOTE__: if given a pattern P and a string X, not always the fact that matches(X,P) is true means that contains(S+X+E,P) with arbitrary strings S and E will be true. Rules can decide to annotate differently the same span based on the surrounding text; for example, maximum entropy PoS taggers can assign a different tag to a token based on the surrounding words.
+__NOTE__: if given a pattern P and a string X, the fact that matches(X,P) is true doesn't necessarily mean that contains(S+X+E,P) with arbitrary strings S and E will be true. Rules can decide to annotate differently the same span based on the surrounding text; for example, PoS taggers can assign a different tag to a token based on the surrounding words.
