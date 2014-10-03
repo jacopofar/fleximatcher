@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 public class TagRuleFactory implements RuleFactory {
     
     private int maximumNesting=5;
-	private FlexiMatcher matcher;
-	private ConcurrentHashMap<String,HashSet<RuleDefinition>> rules=new ConcurrentHashMap<String,HashSet<RuleDefinition>>();
+	private final FlexiMatcher matcher;
+	private ConcurrentHashMap<String,HashSet<RuleDefinition>> rules=new ConcurrentHashMap<>();
 	public TagRuleFactory(FlexiMatcher flexiMatcher) {
 		this.matcher=flexiMatcher;
 	}
@@ -24,7 +24,7 @@ public class TagRuleFactory implements RuleFactory {
 	}
 
 	public Stream<RuleDefinition> getTagPatterns(String name) {
-		return rules.getOrDefault(name, new HashSet<RuleDefinition>()).stream();
+		return rules.getOrDefault(name, new HashSet<>()).stream();
 	}
 
 	public FlexiMatcher getMatcher() {
@@ -47,7 +47,7 @@ public class TagRuleFactory implements RuleFactory {
 	 * */
 	public boolean addTagRule(String tag, String pattern, String identifier, String annotationTemplate) {
 		if(pattern.equals("[tag:"+tag+"]"))
-			throw new RuntimeException();
+			throw new RuntimeException("Circular definition of a rule");
 		if(rules.containsKey(tag)){
 			boolean removed=false;
 			if(identifier!=null)
@@ -56,13 +56,38 @@ public class TagRuleFactory implements RuleFactory {
 			return removed;
 		}
 		else{
-			HashSet<RuleDefinition> p = new HashSet<RuleDefinition>();
+			HashSet<RuleDefinition> p = new HashSet<>();
 			p.add(new RuleDefinition(pattern,identifier,annotationTemplate));
 			rules.put(tag, p);
 			return true;
 		}
 	}
 
+        /**
+          * Add a rule to the existing ones
+	 * @param tag the tag of the rule, which will be used in the tag [tag:name]
+	 * @param rule the rule definition object, containing a pattern and 
+	 * @param identifier identifier an optional identifier for the rule, will be used to remove it 
+	 * @return true if a rule with the same tag and identifier was replaced by the given one, false otherwise
+	 * If the identifier is null, it will be added and will always return false 
+         */
+        public boolean addTagRule(String tag, String identifier,RuleDefinition rule) {
+		if(rules.containsKey(tag)){
+			boolean removed=false;
+			if(identifier!=null)
+				removed= rules.get(tag).removeIf(p->p.getIdentifier().equals(identifier));
+			rules.get(tag).add(rule);
+			return removed;
+		}
+		else{
+			HashSet<RuleDefinition> p = new HashSet<>();
+			p.add(rule);
+			rules.put(tag, p);
+			return true;
+		}
+	}
+
+        
 	/**
 	 * Remove the tag rule with the given identifier
 	 * @param tag the tag of the pattern to forget
