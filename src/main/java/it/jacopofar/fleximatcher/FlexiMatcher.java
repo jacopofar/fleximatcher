@@ -14,6 +14,7 @@ import it.jacopofar.fleximatcher.rules.InsensitiveCaseRuleFactory;
 import it.jacopofar.fleximatcher.rules.MatchingRule;
 import it.jacopofar.fleximatcher.rules.MultiRuleFactory;
 import it.jacopofar.fleximatcher.rules.PlainTextRule;
+import it.jacopofar.fleximatcher.tag.RuleDefinition;
 import it.jacopofar.fleximatcher.tag.TagRuleFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,13 +83,21 @@ public final class FlexiMatcher {
     
     /**
      * Check whether the pattern matches the text
-     * */
+     *
+     * @param text the text to examine
+     * @param pattern the pattern to be matched with the text
+     * @return true if the pattern completely matches the text, false otherwise
+     */
     public boolean matches(String text,String pattern){
         return matches(text,pattern,getDefaultAnnotator(),false,true,false).isMatching();
     }
     /**
-     * Check whether the pattern is contained in the text. That is, it matches with a substring of it
-     * */
+     * Check whether the pattern matches the text
+     *
+     * @param text the text to examine
+     * @param pattern the pattern to be searched in the text
+     * @return true if the pattern appears in the text, false otherwise
+     */
     public boolean contains(String text,String pattern){
         return matches(text,pattern, getDefaultAnnotator(),false,false,false).isMatching();
     }
@@ -130,7 +139,7 @@ public final class FlexiMatcher {
     }
     
     /**
-     * Add a rule to this matcher, which will be used to macth [tag:rulename]
+     * Add a rule to this matcher, which will be used to match [tag:rulename]
      * @param tag the tag of the rule, which will be used in the tag [tag:name]
      * @param pattern the pattern that will be matched and tagged by this rule
      * @param identifier identifier an optional identifier for the rule, will be used to remove it
@@ -141,6 +150,19 @@ public final class FlexiMatcher {
      * */
     public boolean addTagRule(String tag, String pattern, String identifier,String annotationTemplate) {
         return factory.addTagRule(tag,pattern,identifier,annotationTemplate);
+    }
+    
+     /**
+     * Add a rule to this matcher, which will be used to match [tag:rulename]
+     * @param tag the tag of the rule, which will be used in the tag [tag:name]
+     * @param identifier identifier an optional identifier for the rule, will be used to remove it
+     * @param annotationRule an annotation rule, containing the pattern to match and the method to generate the annotation, if any
+     * @return true if a rule with the same tag and identifier was replaced by the given one, false otherwise
+     * If the identifier is null, it will be added and will always return false
+     * e.g.
+     * */
+    public boolean addTagRule(String tag, String identifier, RuleDefinition annotationRule) {
+        return factory.addTagRule(tag, identifier, annotationRule);
     }
     
     
