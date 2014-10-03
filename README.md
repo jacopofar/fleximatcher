@@ -67,16 +67,41 @@ The main class necessary to use Fleximatcher is called Fleximatcher. The usage i
 3. Bind patterns with tag rules
 4. Use the Fleximatcher instance to match text
 
-the library is thread safe and can parse many strings in parallel, tags and rules mapping can be changed in any moment, even while matching a text.
+the library is thread safe and can parse many strings in parallel, tags and rules mapping can be changed in any moment.
 
 Define new tags
 --------------
 
-You can define a new tag by calling the method addTag
+You can define a new tag by calling the addTag methods of FlexiMatcher.
 
- [//]: # (TODO vedere i nomi e le varianti, descriverli brevemente spiegando i metodi per le annotazioni) 
+For example:
 
- [//]: # (TODO esempio dei nick) 
+	fm.addTagRule("fruit", "pear", "id_pear","{'fruit_name':'pear'}")
+	fm.addTagRule("fruit", "a [tag:fruit]", "id_a_fruit","{'fruit_name':#1.fruit_name#,'article':#0#}")
+
+using these rules, the pattern "[tag:fruit]" will annotate "pear" with {'fruit_name':'pear'} and "a pear" with {'fruit_name':'pear','article':'a '} (note the space after the article, the software doesn't give whitespaces a special meaning).
+	
+The first one allows the tag "fruit" to be called and match the string "pear", annotating it with the JSON string {'fruit':'pear'}
+the second one, too, will add a new "fruit" tag (so you can use "[tag:fruit]" to refer to them), matching the pattern "a [tag:fruit]" and returning an annotation containing both the article "a " and the value of the "fruit_name" key associated with the second part of the pattern.
+
+Note that you don't have to define tags in dependency order, so you can insert the second one first as well, the patterns will be evaluated onyl when actually matching a text.
+
+The identifiers (like "id_a_fruit") are used to delete or overwrite the tag rule later. You can add, remove or replace tags in any moment, for example using the library inside a chatbot you could add and remove tags to match nicknames when users join or part.
+
+The annotation expression is a JSON string containing placeholders: #0# is replaced with the text of the first element of the pattern sequence, #1# with the second one, and so on. #1.fruit_name# will be replaced with the key 'fruit_name' of the second pattern component. Nested keys (like #0.father.name#) are not allowed.
+
+This format is made to easily import rules from a TSV, using this utility method:
+
+	FileTagLoader.readTagsFromTSV("rule_list.tsv", fm);
+
+this will load the tag described in the tsv file inside the given fleximatcher instance. Look at the JavaDoc for further details.
+
+If you need something more complex than an annotation expression, you can define your own annotation rules by calling the other addTagRule method:
+
+	public boolean addTagRule(String tag, String identifier, RuleDefinition annotationRule)
+
+the annotationRule object, as described in the JavaDoc, will contain the pattern to match and a method to generate the annotation from the matched ones.
+
 
 Define new rules
 ---------------
