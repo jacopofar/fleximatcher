@@ -39,14 +39,18 @@ public class RuleDefinition {
         return identifier;
     }
     
+    @Override
     public String toString(){
         return "rule ID="+identifier+" pattern='"+pattern+"'"+ (annotationExpression==null?"":"annotation="+annotationExpression);
     }
+    @Override
     public int hashCode(){
         return (pattern.hashCode()+11*(identifier==null?0:identifier.hashCode())+37*(annotationExpression==null?0:annotationExpression.hashCode()));
     }
     
+    @Override
     public boolean equals(Object o){
+        if(this==o) return true;
         if(!(o instanceof RuleDefinition))
             return false;
         return (this.pattern.equals(((RuleDefinition)o).pattern))
@@ -56,7 +60,10 @@ public class RuleDefinition {
     
     /**
      * Get an annotation representing the tag, given the matching sequence
-     * */
+     *
+     * @param text the text this pattern has matched
+     * @param matchSequence the list of annotations resulting from the match
+     * @return  a JSONObject representing the annotation content*/
     public JSONObject getResultingAnnotation(String text,LinkedList<TextAnnotation> matchSequence) {
         if(annotationExpression==null)
             return null;
@@ -74,7 +81,7 @@ public class RuleDefinition {
                     String content;
                     int position=Integer.parseInt(expr.replaceAll("\\..+", ""));
                     try {
-                        content = JSONObject.quote(matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")).toString());
+                        content = JSONObject.quote(matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")));
                     } catch (JSONException e) {
                         e.printStackTrace();
                         throw new RuntimeException("---------error while creating the annotation for "+expr.replaceAll("[0-9]+\\.", ""));
