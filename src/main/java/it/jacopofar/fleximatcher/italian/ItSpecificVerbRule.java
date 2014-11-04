@@ -16,7 +16,7 @@ import it.jacopofar.fleximatcher.rules.MatchingRule;
 
 public class ItSpecificVerbRule extends MatchingRule {
 
-	private HashSet<String> accepted;
+	private final HashSet<CharSequence> accepted;
 	private ItalianModel im;
 	public ItSpecificVerbRule(ItalianModel im, String parameter) throws JSONException {
 		this.im=im;
@@ -27,7 +27,7 @@ public class ItSpecificVerbRule extends MatchingRule {
 			throw new RuntimeException("Invalid JSON: "+parameter);
 		}
 
-		HashSet<String> res=new HashSet<String> ();
+		HashSet<CharSequence> res=new HashSet<> ();
 		ItalianVerbConjugation v = new ItalianVerbConjugation(im);
 		v.setInfinitive(params.getString("infinitive"));
 		for(String mode:ItalianVerbConjugation.getImpersonalModes()){
