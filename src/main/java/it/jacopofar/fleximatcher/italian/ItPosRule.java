@@ -14,21 +14,20 @@ import com.github.jacopofar.italib.postagger.POSUtils;
 
 public class ItPosRule extends MatchingRule {
 
-	private ItalianModel im;
+	private final ItalianModel im;
 	private HashSet<String> acceptedTags;
 
 	public ItPosRule(ItalianModel im, String tag) {
 		this.im=im;
 		if(tag.isEmpty())
 			throw new RuntimeException("tag not valid, mustn't be empty");
-		acceptedTags=new HashSet<String>();
+		acceptedTags=new HashSet<>();
 		for(String candidateTag:POSUtils.getPossibleTags()){
 			if(candidateTag.matches(tag))
-				acceptedTags.add(candidateTag);
-				
+				acceptedTags.add(candidateTag);		
 		}
 		
-		if(acceptedTags.size()==0)
+		if(acceptedTags.isEmpty())
 			throw new RuntimeException("tag "+tag+" not recognized");
 	}
 
