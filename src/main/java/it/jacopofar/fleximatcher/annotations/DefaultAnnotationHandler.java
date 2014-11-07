@@ -14,19 +14,19 @@ import org.json.JSONObject;
 
 
 public class DefaultAnnotationHandler extends AnnotationHandler {
-	private ConcurrentHashMap<Integer,Set<TextAnnotation>> annotationsStored =new ConcurrentHashMap<Integer,Set<TextAnnotation>>();
-	private ConcurrentHashMap<String,Set<TextAnnotation>> annotationsForTag =new ConcurrentHashMap<String,Set<TextAnnotation>>();
+	private final ConcurrentHashMap<Integer,Set<TextAnnotation>> annotationsStored =new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String,Set<TextAnnotation>> annotationsForTag =new ConcurrentHashMap<>();
 	private int numAnnotations;
 	@Override
 	public void addAnnotation(Span span, JSONObject attributes) {
 		numAnnotations++;
 		if(!annotationsStored.containsKey(span.getStart())){
-			annotationsStored.put(span.getStart(), new HashSet<TextAnnotation>());
+			annotationsStored.put(span.getStart(), new HashSet<>());
 		}
 		TextAnnotation ta = new TextAnnotation(span,currentMatcher,attributes);
 		annotationsStored.get(span.getStart()).add(ta);
 		if(!annotationsForTag.contains(currentMatcher))
-			annotationsForTag.put(currentMatcher, new HashSet<TextAnnotation>());
+			annotationsForTag.put(currentMatcher, new HashSet<>());
 		annotationsForTag.get(currentMatcher).add(ta);
 
 	}
@@ -52,11 +52,11 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 		 * 
 		 * If after checking all the rules the set contains length (that is, the last rule ends with at the expected position)
 		 * */
-		HashSet<Integer> startPositions=new HashSet<Integer>();
+		HashSet<Integer> startPositions=new HashSet<>();
 		ConcurrentHashMap<Integer,HashSet<LinkedList<TextAnnotation>>> candidateAnnotations=null;
 		if(populateResult){
 			//this will map a final positions with the lists of length K when matching the K+1 part
-			candidateAnnotations=new ConcurrentHashMap<Integer,HashSet<LinkedList<TextAnnotation>>>(30);
+			candidateAnnotations=new ConcurrentHashMap<>(30);
 
 		}
 		startPositions.add(0);
@@ -65,25 +65,25 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 		}
 		boolean firstStep=true;
 		for(String p:ruleParts){
-			HashSet<Integer> newStartPositions=new HashSet<Integer>();
-			ConcurrentHashMap<Integer,HashSet<LinkedList<TextAnnotation>>> newCandidateAnnotations=new ConcurrentHashMap<Integer,HashSet<LinkedList<TextAnnotation>>>(30);
+			HashSet<Integer> newStartPositions=new HashSet<>();
+			ConcurrentHashMap<Integer,HashSet<LinkedList<TextAnnotation>>> newCandidateAnnotations=new ConcurrentHashMap<>(30);
 			for(int startCandidate:startPositions){
-				for(TextAnnotation ann:annotationsStored.getOrDefault(startCandidate, new HashSet<TextAnnotation>())){
+				for(TextAnnotation ann:annotationsStored.getOrDefault(startCandidate, new HashSet<>())){
 					if(ann.getType().equals(p)){
 						newStartPositions.add(ann.getSpan().getEnd());
 						if(populateResult){
 							if(firstStep){
-								HashSet<LinkedList<TextAnnotation>> expandMe = newCandidateAnnotations.getOrDefault(ann.getSpan().getEnd(), new HashSet<LinkedList<TextAnnotation>>());
-								expandMe.add(new LinkedList<TextAnnotation>(Arrays.asList(new TextAnnotation[]{ann})));
+								HashSet<LinkedList<TextAnnotation>> expandMe = newCandidateAnnotations.getOrDefault(ann.getSpan().getEnd(), new HashSet<>());
+								expandMe.add(new LinkedList<>(Arrays.asList(new TextAnnotation[]{ann})));
 								newCandidateAnnotations.put(ann.getSpan().getEnd(),expandMe);
 							}
 							else{
 								HashSet<LinkedList<TextAnnotation>> expandUs = candidateAnnotations.get(ann.getSpan().getStart());
 								if(expandUs==null)
 									continue;
-								for(LinkedList<TextAnnotation> l:expandUs){
-									l.addLast(ann);
-								}
+                                                                expandUs.stream().forEach((l) -> {
+                                                                    l.addLast(ann);
+                                                            });
 								if(newCandidateAnnotations.containsKey(ann.getSpan().getEnd())){
 									newCandidateAnnotations.get(ann.getSpan().getEnd()).addAll(expandUs);
 								}
@@ -105,7 +105,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 		//all of the rules, in sequence, matched. Check that the last one ends at the correct length
 		HashSet<LinkedList<TextAnnotation>> result;
 		if(startPositions.contains(length)||!matchWhole){
-			result = new HashSet<LinkedList<TextAnnotation>>();
+			result = new HashSet<>();
 			for(Entry<Integer, HashSet<LinkedList<TextAnnotation>>> e:candidateAnnotations.entrySet()){
 				result.addAll(e.getValue());
 			}
