@@ -1,6 +1,7 @@
 package it.jacopofar.fleximatcher.annotations;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
@@ -15,7 +16,7 @@ import opennlp.tools.util.Span;
 public abstract class AnnotationHandler {
 
 	protected String currentMatcher;
-	private HashSet<String> matchedRules=new HashSet<String>();
+	private final HashSet<String> matchedRules=new HashSet<>();
 
 
 	/**
@@ -78,5 +79,14 @@ public abstract class AnnotationHandler {
 	 * */
 	public abstract int getNestingLevel();
 	
+        /**
+         * Return the ordered list of matchers of this handler and its ancestors
+         */
+        public abstract List<String> getAncestorsMatchers();
+        /**
+         * Return the ordered list of the number of annotations at creation time (hence the ugly name)of this handler and its ancestors
+         * Since annotations can only be added, never removed or changed, elements are always sorted
+         */
+        public abstract List<Integer> getAncestorsAnnotationCountersAtCreationTime();
 
 }

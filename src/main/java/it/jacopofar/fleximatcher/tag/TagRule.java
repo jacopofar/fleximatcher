@@ -10,6 +10,7 @@ import opennlp.tools.util.Span;
 import it.jacopofar.fleximatcher.annotations.AnnotationHandler;
 import it.jacopofar.fleximatcher.annotations.TextAnnotation;
 import it.jacopofar.fleximatcher.rules.MatchingRule;
+import java.util.List;
 
 public class TagRule extends MatchingRule {
     
@@ -35,6 +36,18 @@ public class TagRule extends MatchingRule {
          
             //System.out.println("--"+ah.getNestingLevel()+" about to try pattern: "+pat);
             AnnotationHandler sa = ah.getSubHandler(pat.getPattern());
+            //to avoid cycles during matching, let's look for ancestor matchers with the same pattern and the same amount of annotations at beginning
+            //if there is another one, this one will not produce anything and we'll discard it
+            //this is done to avoid useless operations and make meaningful the exception thrown when reaching maximum depth
+            List<String> ancMats = sa.getAncestorsMatchers();
+            for(int i=sa.getNestingLevel()-1;i>0;i--){
+               if(ancMats.get(i).equals(pat.getPattern())
+                       && sa.getAncestorsAnnotationCountersAtCreationTime().get(i)==sa.getAnnotationsCount())
+                   //ancestor with the same pattern and same amount of annotations and same pattern
+                   //don't waste time matching it again
+                   //and don't throw maximum nesting exceptions
+                   return;
+            }
             Optional<Set<LinkedList<TextAnnotation>>> subMatches = ruleFactory.getMatcher().matches(text, pat.getPattern(), sa, false, false,true).getAnnotations();
             if(subMatches.isPresent()){
                 subMatches.get().stream().forEach((matchSequence) -> {
