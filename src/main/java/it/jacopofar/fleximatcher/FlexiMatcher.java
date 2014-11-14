@@ -189,7 +189,7 @@ public final class FlexiMatcher {
         factory.clearRules();
     }
     /**
-     * Set the maximum nesting level that can be used when matchign tags.
+     * Set the maximum nesting level that can be used when matching tags.
      * Since a tag definition can call other tags, recursively, fleximatcher could find loops when matching them.
      * Instead of checking the rules, a maximum recursion level is applied, when it's reached the matching process stops.
      * 
@@ -206,5 +206,12 @@ public final class FlexiMatcher {
      */
     public int getMaximumTagNesting(){
         return factory.getMaximumNesting();
+    }
+    /**
+     * Throws an exception when the matching process reaches the maximum allowed depth
+     * It happens when rules recursively try to annotate (that is, expand grammar rules)
+     */
+    public void throwExceptionWhenReachingMaximumDepth(boolean throwIt){
+        factory.throwExceptionWhenReachingMaximumDepth(throwIt);
     }
 }
