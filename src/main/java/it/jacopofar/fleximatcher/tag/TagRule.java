@@ -25,29 +25,32 @@ public class TagRule extends MatchingRule {
     @Override
     public boolean annotate(String text, AnnotationHandler ah) {
         //System.out.println("--"+ah.getNestingLevel()+" TAG RULE: asked to annotate '"+text+"', I'm the rule "+name);
-        if(ah.getNestingLevel()>ruleFactory.getMaximumNesting()){
+        if(ah.getNestingLevel()>ruleFactory.getMaximumNesting()){  
+
             if(ruleFactory.throwExceptionWhenReachingMaximumDepth())
-                throw new RuntimeException("Reached maximum tag expansion depth with "+ah.getNestingLevel()+" for tag '"+name+"'. Check the tag patterns, increase the maximum nestign level, or set the matcher to not throw this exception");
+                throw new RuntimeException("Reached maximum tag expansion depth with "+ah.getNestingLevel()+" for tag '"+name+"'.Annotator hierarchy:"+ah.getAncestorsMatchers().toString()+"  number of annotations:"+ah.getAncestorsAnnotationCountersAtCreationTime().toString()+" Check the tag patterns, increase the maximum nestign level, or set the matcher to not throw this exception");
             else
                 return false;
         }
-        
+        List<String> ancMats = ah.getAncestorsMatchers();
+        for(int i=ah.getNestingLevel()-1;i>0;i--){
+            if(ancMats.get(i).equals("[tag:"+name+"]")
+                    && ah.getAncestorsAnnotationCountersAtCreationTime().get(i)==ah.getAnnotationsCount()){
+                //ancestor with the same pattern and same amount of annotations and same pattern
+                //don't waste time matching it again
+                //and don't throw maximum nesting exceptions
+                return false;
+                
+            }
+        }
         ruleFactory.getTagPatterns(name).forEach(pat->{
-         
+            
             //System.out.println("--"+ah.getNestingLevel()+" about to try pattern: "+pat);
             AnnotationHandler sa = ah.getSubHandler(pat.getPattern());
             //to avoid cycles during matching, let's look for ancestor matchers with the same pattern and the same amount of annotations at beginning
             //if there is another one, this one will not produce anything and we'll discard it
             //this is done to avoid useless operations and make meaningful the exception thrown when reaching maximum depth
-            List<String> ancMats = sa.getAncestorsMatchers();
-            for(int i=sa.getNestingLevel()-1;i>0;i--){
-               if(ancMats.get(i).equals(pat.getPattern())
-                       && sa.getAncestorsAnnotationCountersAtCreationTime().get(i)==sa.getAnnotationsCount())
-                   //ancestor with the same pattern and same amount of annotations and same pattern
-                   //don't waste time matching it again
-                   //and don't throw maximum nesting exceptions
-                   return;
-            }
+            
             Optional<Set<LinkedList<TextAnnotation>>> subMatches = ruleFactory.getMatcher().matches(text, pat.getPattern(), sa, false, false,true).getAnnotations();
             if(subMatches.isPresent()){
                 subMatches.get().stream().forEach((matchSequence) -> {
