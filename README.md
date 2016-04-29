@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jacopofar/fleximatcher.svg?branch=master)](https://travis-ci.org/jacopofar/fleximatcher)
 What's this?
 ============
 
