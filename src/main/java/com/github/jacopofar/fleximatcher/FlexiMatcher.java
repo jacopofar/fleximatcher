@@ -5,8 +5,6 @@ import com.github.jacopofar.fleximatcher.annotations.DefaultAnnotationHandler;
 import com.github.jacopofar.fleximatcher.annotations.MatchingResults;
 import com.github.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
 import com.github.jacopofar.fleximatcher.expressions.ExpressionParser;
-import com.github.jacopofar.fleximatcher.italian.ItSpecificVerbRuleFactory;
-import com.github.jacopofar.fleximatcher.italian.ItVerbFormRuleFactory;
 import com.github.jacopofar.fleximatcher.rule.RegexRuleFactory;
 import com.github.jacopofar.fleximatcher.rule.RuleFactory;
 import com.github.jacopofar.fleximatcher.rules.InsensitiveCaseRuleFactory;
@@ -15,7 +13,6 @@ import com.github.jacopofar.fleximatcher.rules.MultiRuleFactory;
 import com.github.jacopofar.fleximatcher.rules.PlainTextRule;
 import com.github.jacopofar.fleximatcher.tag.RuleDefinition;
 import com.github.jacopofar.fleximatcher.tag.TagRuleFactory;
-import com.github.jacopofar.fleximatcher.italian.ItPosRuleFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -112,18 +109,13 @@ public final class FlexiMatcher {
     
     public static void main(String argc[]){
         FlexiMatcher fm=new FlexiMatcher();
-        fm.bind("it-pos", new ItPosRuleFactory());
-        fm.bind("it-verb-conjugated", new ItSpecificVerbRuleFactory());
-        fm.bind("it-verb-form", new ItVerbFormRuleFactory());
-        fm.addTagRule("frutto","pera","id_pera");
-        fm.addTagRule("frutto","la [tag:frutto]","id_nested");
-        String analyzeThis=" il cane mangia la pera";
-        fm.matches(analyzeThis,"la [i:pera]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true).getAnnotations().get().stream().forEach((k) -> {
+        fm.addTagRule("fruit","pear","id_pear");
+        fm.addTagRule("fruit","the [tag:fruit]","id_nested");
+        String analyzeThis="the dog eats the pear";
+        fm.matches(analyzeThis,"the [i:pear]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true).getAnnotations().get().stream().forEach((k) -> {
             System.out.println(">>"+k);
         });
-        System.out.println(fm.matches(analyzeThis,"la [tag:frutto]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
-        System.out.println(fm.matches(analyzeThis,"[it-pos:RD] [it-pos:Ss] è [it-pos:As]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
-        System.out.println(fm.matches(analyzeThis,"[it-verb-conjugated:mangiare]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
+        System.out.println(fm.matches(analyzeThis,"the [tag:fruit]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
     }
     
     /**
