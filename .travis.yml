@@ -1,1 +1,5 @@
 language: java
+jdk:
+  - oraclejdk8
+before_install:
+  - mkdir lib && cd lib && wget https://github.com/jacopofar/italian-nlp-library/releases/download/1.0.0/italian-nlp-library-0.0.1-SNAPSHOT.jar && cd ..
