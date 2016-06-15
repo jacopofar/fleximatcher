@@ -37,8 +37,14 @@ public class ExpressionParser {
 				last=k+1;
 			}
 		}
-		//save the last one
+		//System.out.println("pattern '" + pattern + "' open brackets " + openSquares);
+		if(openSquares != 0){
+			//the last pattern was a "fake" one, for example 'aB[r:x'
+			//it is very likely an user error, refuse it
+			throw new RuntimeException("Square brackets are unbalanced in pattern '" + pattern + "'");
+		}
 		ret.add(pattern.substring(last));
+
 		return ret.stream().filter(p->p!=null && p.length()>0).toArray(count->new String[count]);
 	}
 
