@@ -1,20 +1,19 @@
 package test.com.github.jacopofar.fleximatcher;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import com.github.jacopofar.fleximatcher.FlexiMatcher;
 import com.github.jacopofar.fleximatcher.annotations.AnnotationHandler;
 import com.github.jacopofar.fleximatcher.annotations.DefaultAnnotationHandler;
 import com.github.jacopofar.fleximatcher.annotations.MatchingResults;
 import com.github.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHandler;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.*;
 
 public class TestBasic {
 
@@ -45,6 +44,21 @@ public class TestBasic {
 		assertFalse(fm.matches("AbC", "ABC"));
 		assertTrue(fm.matches("AbC", "[r:[KAb]{2}]C"));
 		assertTrue(fm.matches("AbC", "[r:[AbD]{2}]C"));
+	}
+	@Test
+	public void testExpressionExceptions() {
+		//generate proper exceptions for these ones
+		assertThatThrownBy(() -> {
+			fm.matches("AbC", "[r:Ab");
+		}).hasMessageContaining("brackets are unbalanced in pattern");
+
+		assertThatThrownBy(() -> {
+			fm.matches("AbC", "[r:");
+		}).hasMessageContaining("brackets are unbalanced in pattern");
+		assertThatThrownBy(() -> {
+			fm.matches("yeeee", "[i:   [");
+		}).hasMessageContaining("brackets are unbalanced in pattern");
+
 	}
 	@Test
 	public void testMulti() {
