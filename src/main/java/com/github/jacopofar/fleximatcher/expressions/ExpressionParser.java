@@ -27,7 +27,7 @@ public class ExpressionParser {
 			if(pattern.charAt(k)==']') openSquares--;
 
 			if(pattern.charAt(k)=='[' && openSquares==1){
-				//just entered an new chunk, store the previous one and uopdate the starting point
+				//just entered an new chunk, store the previous one and update the starting point
 				ret.add(pattern.substring(last,k));
 				last=k;
 			}
