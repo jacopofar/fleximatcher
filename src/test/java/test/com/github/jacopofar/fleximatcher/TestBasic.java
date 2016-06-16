@@ -44,6 +44,10 @@ public class TestBasic {
 		assertFalse(fm.matches("AbC", "ABC"));
 		assertTrue(fm.matches("AbC", "[r:[KAb]{2}]C"));
 		assertTrue(fm.matches("AbC", "[r:[AbD]{2}]C"));
+		//check that a deeper match works, too
+		assertFalse(fm.matches("AbC", "A[i:b][r:k]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching());
+		assertTrue(fm.matches("AbC", "A[i:b][r:[cC]]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching());
+
 	}
 	@Test
 	public void testExpressionExceptions() {
