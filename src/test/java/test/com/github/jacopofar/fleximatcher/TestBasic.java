@@ -47,6 +47,18 @@ public class TestBasic {
 		//check that a deeper match works, too
 		assertFalse(fm.matches("AbC", "A[i:b][r:k]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching());
 		assertTrue(fm.matches("AbC", "A[i:b][r:[cC]]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching());
+		assertTrue(fm.matches("eeAbC", "A[i:b][r:[cC]]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching());
+
+		//regex refuse an empty pattern
+		assertThatThrownBy(() -> {
+			fm.matches("eeAbC", "A[i:b][r]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching();
+		}).hasMessageContaining("Cannot create a regex annotator with an empty pattern");
+
+		assertThatThrownBy(() -> {
+			fm.matches("eeAbC", "A[i:b][r]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching();
+		}).hasMessageContaining("Cannot create a regex annotator with an empty pattern");
+
+		fm.matches("eeAbC", "A[i:b][r:k?]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching();
 
 	}
 	@Test
@@ -62,7 +74,6 @@ public class TestBasic {
 		assertThatThrownBy(() -> {
 			fm.matches("yeeee", "[i:   [");
 		}).hasMessageContaining("brackets are unbalanced in pattern");
-
 	}
 	@Test
 	public void testMulti() {

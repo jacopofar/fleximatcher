@@ -1,11 +1,10 @@
 package com.github.jacopofar.fleximatcher.rules;
 
 import com.github.jacopofar.fleximatcher.annotations.AnnotationHandler;
+import opennlp.tools.util.Span;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import opennlp.tools.util.Span;
 
 public class RegexRule extends MatchingRule {
 
@@ -29,11 +28,17 @@ public class RegexRule extends MatchingRule {
 			}
 			m.reset();
 			while(m.find()){
-				ah.addAnnotation(new Span(m.start(),m.end()),null);
+				if(m.start() != m.end()) {
+					ah.addAnnotation(new Span(m.start(),m.end()),null);
+				}
 				for(int start=m.start();start<m.end()+1;start++)
 					for(int end=start;end<m.end()+1;end++)
-						if(pattern.matcher(text.substring(start, end)).matches())
-							ah.addAnnotation(new Span(start,end),null);
+						if(pattern.matcher(text.substring(start, end)).matches()){
+							//don't try to add annotation for empty matches
+							if(start != end){
+								ah.addAnnotation(new Span(start,end),null);
+							}
+						}
 
 			}
 		}
