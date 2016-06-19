@@ -1,9 +1,10 @@
 package com.github.jacopofar.fleximatcher.tag;
 
-import com.github.jacopofar.fleximatcher.rules.MatchingRule;
 import com.github.jacopofar.fleximatcher.FlexiMatcher;
 import com.github.jacopofar.fleximatcher.rule.RuleFactory;
+import com.github.jacopofar.fleximatcher.rules.MatchingRule;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -118,5 +119,8 @@ public class TagRuleFactory implements RuleFactory {
     public boolean throwExceptionWhenReachingMaximumDepth(){
        return throwExceptionWhenTooDeep;
     }
-    
+
+    public Stream<String> getTagNames() {
+        return Collections.list(rules.keys()).stream();
+    }
 }

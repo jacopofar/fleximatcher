@@ -15,6 +15,7 @@ import com.github.jacopofar.fleximatcher.tag.RuleDefinition;
 import com.github.jacopofar.fleximatcher.tag.TagRuleFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 
 public final class FlexiMatcher {
@@ -205,5 +206,9 @@ public final class FlexiMatcher {
      */
     public void throwExceptionWhenReachingMaximumDepth(boolean throwIt){
         factory.throwExceptionWhenReachingMaximumDepth(throwIt);
+    }
+
+    public Stream<String> getTagNames(){
+        return factory.getTagNames();
     }
 }
