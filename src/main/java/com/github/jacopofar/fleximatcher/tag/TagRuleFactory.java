@@ -123,4 +123,8 @@ public class TagRuleFactory implements RuleFactory {
     public Stream<String> getTagNames() {
         return Collections.list(rules.keys()).stream();
     }
+
+    public Stream<RuleDefinition> getTagDefinitions(String tagName) {
+        return rules.get(tagName).stream();
+    }
 }

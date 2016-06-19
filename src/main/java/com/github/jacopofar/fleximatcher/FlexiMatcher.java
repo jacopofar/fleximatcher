@@ -211,4 +211,8 @@ public final class FlexiMatcher {
     public Stream<String> getTagNames(){
         return factory.getTagNames();
     }
+
+    public Stream<RuleDefinition> getTagDefinitions(String tagName) {
+        return factory.getTagDefinitions(tagName);
+    }
 }
