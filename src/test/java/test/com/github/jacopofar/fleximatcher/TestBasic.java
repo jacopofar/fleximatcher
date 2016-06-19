@@ -129,7 +129,7 @@ public class TestBasic {
 		
 		assertTrue(fm.removeTagRule("fruit","id_a_fruit"));
 		assertFalse(fm.removeTagRule("fruit","id_a_fruit"));
-		assertFalse(fm.removeTagRule("fruit","id thatdoesn't exist"));
+		assertFalse(fm.removeTagRule("fruit","id that doesn't exist"));
 		ah = new DefaultAnnotationHandler();
 		res = fm.matches(multiple, "[tag:fruit]",ah, true,false,true);
 		assertEquals("number of annotations at top level",3,res.getAnnotations().get().size(),0.0);
