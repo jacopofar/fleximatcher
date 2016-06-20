@@ -125,6 +125,10 @@ public class TagRuleFactory implements RuleFactory {
     }
 
     public Stream<RuleDefinition> getTagDefinitions(String tagName) {
+        HashSet<RuleDefinition> rs = rules.get(tagName);
+        if (rs == null){
+            return Stream.empty();
+        }
         return rules.get(tagName).stream();
     }
 }

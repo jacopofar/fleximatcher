@@ -91,7 +91,9 @@ public class TestBasic {
 	@Test
 	public void testTag() {
 		assertTrue("identity",fm.matches("AbC", "AbC"));
+		assertFalse( "the rule doesn't appear before being inserted",fm.getTagRule("fruit","id_apple").isPresent());
 		fm.addTagRule("fruit", "apple", "id_apple");
+		assertTrue("the rule appear after being inserted", fm.getTagRule("fruit","id_apple").isPresent());
 		assertTrue("simple tag",fm.matches("apple", "[tag:fruit]"));
 		fm.addTagRule("fruit", "an [tag:fruit]", "id_an_fruit");
 		assertTrue("nested tag",fm.matches("an apple", "[tag:fruit]"));

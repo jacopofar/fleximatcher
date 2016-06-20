@@ -14,6 +14,7 @@ import com.github.jacopofar.fleximatcher.rules.PlainTextRule;
 import com.github.jacopofar.fleximatcher.tag.RuleDefinition;
 import com.github.jacopofar.fleximatcher.tag.TagRuleFactory;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -214,5 +215,15 @@ public final class FlexiMatcher {
 
     public Stream<RuleDefinition> getTagDefinitions(String tagName) {
         return factory.getTagDefinitions(tagName);
+    }
+
+    /**
+     * Return the Optional for the given tag and id
+     * The Optional is empty both if the tag is unknown or if it's present but hasn't the given id
+     * */
+    public Optional<RuleDefinition> getTagRule(String tagName, String ruleId) {
+        Stream<RuleDefinition> ts = factory.getTagDefinitions(tagName);
+        if (ts == null) return Optional.empty();
+        return ts.filter(r -> r.getIdentifier() == ruleId).findFirst();
     }
 }
