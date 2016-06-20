@@ -208,11 +208,16 @@ public final class FlexiMatcher {
     public void throwExceptionWhenReachingMaximumDepth(boolean throwIt){
         factory.throwExceptionWhenReachingMaximumDepth(throwIt);
     }
-
+    /**
+     * Return the list of known tag names
+     * */
     public Stream<String> getTagNames(){
         return factory.getTagNames();
     }
 
+    /**
+     * Return the stream of tag definitions for a given tag
+     * */
     public Stream<RuleDefinition> getTagDefinitions(String tagName) {
         return factory.getTagDefinitions(tagName);
     }

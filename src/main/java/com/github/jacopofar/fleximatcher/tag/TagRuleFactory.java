@@ -103,7 +103,12 @@ public class TagRuleFactory implements RuleFactory {
             throw new RuntimeException("identifier and tag cannot be null");
         if(!rules.containsKey(tag))
             throw new RuntimeException("tag "+tag+" unknown!");
-        return rules.get(tag).removeIf(p->p.getIdentifier().equals(identifier));
+        boolean retVal = rules.get(tag).removeIf(p->p.getIdentifier().equals(identifier));
+        //if the rule was the last one, delete the tag name too
+        if (rules.get(tag).size() == 0){
+            rules.remove(tag);
+        }
+        return retVal;
     }
     
     public void clearRules() {

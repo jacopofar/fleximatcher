@@ -157,6 +157,12 @@ public class TestBasic {
 				p->p.getJSON()==null?false:p.getJSON().get().optString("internal_fruit").equals("apple")));
 		assertTrue(res.getFlatAnnotations().anyMatch(
 				p->p.getJSON()==null?false:p.getJSON().get().optString("internal_fruit").equals("pear")));
-		
+
+		fm.addTagRule("orphantag", "hello", "id1");
+		assertTrue("future orphan tag rule is present", fm.getTagRule("orphantag","id1").isPresent());
+		assertTrue("future orphan tag name is present",fm.getTagNames().anyMatch(p -> p.equals("orphantag")));
+		fm.removeTagRule("orphantag","id1");
+		assertFalse("orphan tag name is not present anymore",fm.getTagNames().anyMatch(p -> p.equals("orphantag")));
+
 	}
 }
