@@ -229,6 +229,6 @@ public final class FlexiMatcher {
     public Optional<RuleDefinition> getTagRule(String tagName, String ruleId) {
         Stream<RuleDefinition> ts = factory.getTagDefinitions(tagName);
         if (ts == null) return Optional.empty();
-        return ts.filter(r -> r.getIdentifier() == ruleId).findFirst();
+        return ts.filter(r -> r.getIdentifier().equals(ruleId)).findFirst();
     }
 }
