@@ -24,7 +24,7 @@ public abstract class AnnotationHandler {
 	 * @param span the text span to annotate
 	 * @attributes the JSON attributes to assign, can be null
 	 * */
-	public abstract void addAnnotation(Span span,JSONObject attributes); 
+	public abstract void addAnnotation(Span span,JSONObject attributes);
 	/**
 	 * Set a String identifier for the rule currently matching.
 	 * This method has to be called before invoking a rule, the rule should not call
@@ -36,7 +36,7 @@ public abstract class AnnotationHandler {
 	public String getCurrentMatcher(){
 		return currentMatcher;
 	}
-	
+
 	public boolean hasBeenUsed(String string) {
 		return matchedRules.contains(string);
 	}
@@ -69,7 +69,7 @@ public abstract class AnnotationHandler {
 	/**
 	 * Return a stream of positions with sets of annotations starting at that position.
 	 * This includes all of the annotations
-	 * 
+	 *
 	 * */
 	public abstract Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream();
 
@@ -78,15 +78,15 @@ public abstract class AnnotationHandler {
 	 * The root AnnotationHandler is at level 0, a subhandler has level 1, the a subhandler obtained from it has level 2, and so on.
 	 * */
 	public abstract int getNestingLevel();
-	
-        /**
-         * Return the ordered list of matchers of this handler and its ancestors
-         */
-        public abstract List<String> getAncestorsMatchers();
-        /**
-         * Return the ordered list of the number of annotations at creation time (hence the ugly name)of this handler and its ancestors
-         * Since annotations can only be added, never removed or changed, elements are always sorted
-         */
-        public abstract List<Integer> getAncestorsAnnotationCountersAtCreationTime();
+
+	/**
+	 * Return the ordered list of matchers of this handler and its ancestors
+	 */
+	public abstract List<String> getAncestorsMatchers();
+	/**
+	 * Return the ordered list of the number of annotations at creation time (hence the ugly name)of this handler and its ancestors
+	 * Since annotations can only be added, never removed or changed, elements are always sorted
+	 */
+	public abstract List<Integer> getAncestorsAnnotationCountersAtCreationTime();
 
 }
