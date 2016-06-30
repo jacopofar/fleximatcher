@@ -16,20 +16,6 @@ public class TagRuleFactory implements RuleFactory {
     private boolean throwExceptionWhenTooDeep=false;
     private final FlexiMatcher matcher;
     private final ConcurrentHashMap<String,HashSet<RuleDefinition>> rules=new ConcurrentHashMap<>();
-    private boolean explainTagging = true;
-    /***
-     * Requires tags to add an __explain field to any annotation, useful to inspect why a text was tagged in a given way
-     * */
-    public boolean isExplainTagging() {
-        return explainTagging;
-    }
-
-    /***
-     * Requires tags to add an __explain field to any annotation, useful to inspect why a text was tagged in a given way
-     * */
-    public void setExplainTagging(boolean explainTagging) {
-        this.explainTagging = explainTagging;
-    }
 
     public TagRuleFactory(FlexiMatcher flexiMatcher) {
         this.matcher=flexiMatcher;

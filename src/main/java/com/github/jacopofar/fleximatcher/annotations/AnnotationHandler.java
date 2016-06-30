@@ -16,8 +16,12 @@ import opennlp.tools.util.Span;
 public abstract class AnnotationHandler {
 
 	protected String currentMatcher;
+	protected boolean requiresExplanation = false;
 	private final HashSet<String> matchedRules=new HashSet<>();
-
+	/**
+	 * Indicates annotators to add an __explain field to any annotation, useful to inspect why a text was annotated in a given way
+	 * */
+	public boolean requiresExplanation(){return requiresExplanation;}
 
 	/**
 	 * Annotate a text span with the given attributes

@@ -166,14 +166,16 @@ public final class FlexiMatcher {
      * */
     public boolean removeTagRule(String tag,String identifier) {
         return factory.removeTagRule(tag,identifier);
-        
     }
     
     public static AnnotationHandler getDefaultAnnotator() {
         return new DefaultAnnotationHandler();
     }
-    
-    
+    public static AnnotationHandler getDefaultAnnotator(boolean requireExplanations) {
+        return new DefaultAnnotationHandler(requireExplanations);
+    }
+
+
     public boolean isBoundRule(String ruleName) {
         return rules.containsKey(ruleName);
     }

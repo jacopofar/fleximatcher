@@ -54,7 +54,7 @@ public class TagRule extends MatchingRule {
             if(subMatches.isPresent()){
                 subMatches.get().stream().forEach((matchSequence) -> {
                     JSONObject annotation=pat.getResultingAnnotation(text,matchSequence);
-                    if(ruleFactory.isExplainTagging()){
+                    if(ah.requiresExplanation()){
                         if (annotation == null){
                             annotation = new JSONObject();
                         }

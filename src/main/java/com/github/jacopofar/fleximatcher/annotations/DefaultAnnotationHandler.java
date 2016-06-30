@@ -1,19 +1,13 @@
 package com.github.jacopofar.fleximatcher.annotations;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import opennlp.tools.util.Span;
+import org.json.JSONObject;
+
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
-
-import opennlp.tools.util.Span;
-
-import org.json.JSONObject;
 
 
 public class DefaultAnnotationHandler extends AnnotationHandler {
@@ -24,6 +18,11 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
     static{
         zeroList.add(0);
     }
+    public DefaultAnnotationHandler() {}
+    public DefaultAnnotationHandler(boolean explain) {
+        this.requiresExplanation = explain;
+    }
+
     @Override
     public void addAnnotation(Span span, JSONObject attributes) {
         numAnnotations++;
