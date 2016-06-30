@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class TagRuleFactory implements RuleFactory {
     
-    private int maximumNesting=5;
+    private int maximumNesting=15;
     private boolean throwExceptionWhenTooDeep=false;
     private final FlexiMatcher matcher;
     private final ConcurrentHashMap<String,HashSet<RuleDefinition>> rules=new ConcurrentHashMap<>();
