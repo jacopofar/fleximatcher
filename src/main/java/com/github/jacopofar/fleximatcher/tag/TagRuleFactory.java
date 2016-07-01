@@ -1,44 +1,45 @@
 package com.github.jacopofar.fleximatcher.tag;
 
 import com.github.jacopofar.fleximatcher.FlexiMatcher;
+import com.github.jacopofar.fleximatcher.expressions.ExpressionParser;
 import com.github.jacopofar.fleximatcher.rule.RuleFactory;
 import com.github.jacopofar.fleximatcher.rules.MatchingRule;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 
 public class TagRuleFactory implements RuleFactory {
-    
+
     private int maximumNesting=15;
     private boolean throwExceptionWhenTooDeep=false;
     private final FlexiMatcher matcher;
-    private final ConcurrentHashMap<String,HashSet<RuleDefinition>> rules=new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,LinkedList<RuleDefinition>> rules=new ConcurrentHashMap<>();
 
     public TagRuleFactory(FlexiMatcher flexiMatcher) {
         this.matcher=flexiMatcher;
     }
-    
+
     @Override
     public MatchingRule getRule(String tagName) {
         return new TagRule(this,tagName);
     }
-    
+
     public Stream<RuleDefinition> getTagPatterns(String name) {
-        return rules.getOrDefault(name, new HashSet<>()).stream();
+        return rules.getOrDefault(name, new LinkedList<>()).stream();
     }
-    
+
     public FlexiMatcher getMatcher() {
         return matcher;
-        
+
     }
-    
+
     public int getMaximumNesting() {
         return maximumNesting;
     }
-    
+
     /**
      * Add a rule to the existing ones
      * @param tag the tag of the rule, which will be used in the tag [tag:name]
@@ -54,18 +55,24 @@ public class TagRuleFactory implements RuleFactory {
         if(rules.containsKey(tag)){
             boolean removed=false;
             if(identifier!=null)
-                removed= rules.get(tag).removeIf(p->p.getIdentifier().equals(identifier));
-            rules.get(tag).add(new RuleDefinition(pattern,identifier,annotationTemplate));
+                removed = rules.get(tag).removeIf(p->p.getIdentifier().equals(identifier));
+            //insert the terminal patterns first, otherwise recursive matching using annotation counter and subhandlers will not work
+            //see the case "an an an an apple" with the rules "tag:fruit => apple" and "tag:fruit => an [tag:fruit]"
+            //in that case matching the second rule first it matches all the "an" on the first swipe and further recursive calls appear to not add anything
+            if(pattern.contains("[tag:"))
+                rules.get(tag).addLast(new RuleDefinition(pattern,identifier,annotationTemplate));
+            else
+                rules.get(tag).addFirst(new RuleDefinition(pattern,identifier,annotationTemplate));
             return removed;
         }
         else{
-            HashSet<RuleDefinition> p = new HashSet<>();
+            LinkedList<RuleDefinition> p = new LinkedList<>();
             p.add(new RuleDefinition(pattern,identifier,annotationTemplate));
             rules.put(tag, p);
             return true;
         }
     }
-    
+
     /**
      * Add a rule to the existing ones
      * @param tag the tag of the rule, which will be used in the tag [tag:name]
@@ -83,14 +90,14 @@ public class TagRuleFactory implements RuleFactory {
             return removed;
         }
         else{
-            HashSet<RuleDefinition> p = new HashSet<>();
+            LinkedList<RuleDefinition> p = new LinkedList<>();
             p.add(rule);
             rules.put(tag, p);
             return true;
         }
     }
-    
-    
+
+
     /**
      * Remove the tag rule with the given identifier
      * @param tag the tag of the pattern to forget
@@ -110,11 +117,11 @@ public class TagRuleFactory implements RuleFactory {
         }
         return retVal;
     }
-    
+
     public void clearRules() {
         rules.clear();
     }
-    
+
     public void setMaximumNesting(int maxDepth) {
         maximumNesting=maxDepth;
     }
@@ -122,7 +129,7 @@ public class TagRuleFactory implements RuleFactory {
         throwExceptionWhenTooDeep=doIt;
     }
     public boolean throwExceptionWhenReachingMaximumDepth(){
-       return throwExceptionWhenTooDeep;
+        return throwExceptionWhenTooDeep;
     }
 
     public Stream<String> getTagNames() {
@@ -130,10 +137,12 @@ public class TagRuleFactory implements RuleFactory {
     }
 
     public Stream<RuleDefinition> getTagDefinitions(String tagName) {
-        HashSet<RuleDefinition> rs = rules.get(tagName);
+        LinkedList<RuleDefinition> rs = rules.get(tagName);
         if (rs == null){
             return Stream.empty();
         }
         return rules.get(tagName).stream();
     }
+
+
 }
