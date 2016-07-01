@@ -4,12 +4,11 @@ import com.github.jacopofar.fleximatcher.FlexiMatcher;
 import com.github.jacopofar.fleximatcher.annotations.AnnotationHandler;
 import com.github.jacopofar.fleximatcher.expressions.ExpressionParser;
 import com.github.jacopofar.fleximatcher.rules.MatchingRule;
+import opennlp.tools.util.Span;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
-
-import opennlp.tools.util.Span;
 
 public class MultiRule extends MatchingRule {
 

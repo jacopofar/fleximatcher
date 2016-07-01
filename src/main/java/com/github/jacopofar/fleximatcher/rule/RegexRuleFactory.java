@@ -13,4 +13,9 @@ public class RegexRuleFactory implements RuleFactory {
 		return new RegexRule(parameter);
 	}
 
+	@Override
+	public String generateSample(String parameter) {
+		return null;
+	}
+
 }

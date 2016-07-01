@@ -59,7 +59,6 @@ public class TestBasic {
 		}).hasMessageContaining("Cannot create a regex annotator with an empty pattern");
 
 		fm.matches("eeAbC", "A[i:b][r:k?]", FlexiMatcher.getDefaultAnnotator(), true, false, true).isMatching();
-
 	}
 	@Test
 	public void testExpressionExceptions() {
@@ -85,6 +84,7 @@ public class TestBasic {
 		ResultPrintingAnnotationHandler ah = new ResultPrintingAnnotationHandler("AbC");
 		assertTrue("nested multi",fm.matches("AbC", "A[multi:[r:[bD]+][i:B][multi:b]]C",ah, true,true,true).isMatching());
 		assertEquals("number of annotations:",8.0,ah.getAnnotationsCount(),0.0);
+        assertEquals("A[multi:[r:[bD]+][i:B]]C", fm.generateSample("A[multi:[r:[bD]+][i:B]]C"));
 
 	}
 
@@ -103,6 +103,60 @@ public class TestBasic {
 		assertTrue("nested tag",fm.matches("a pear", "[tag:fruit]"));
 		assertFalse("nested tag",fm.matches("a", "[tag:fruit]"));
 		assertFalse("nested tag",fm.matches("an", "[tag:fruit]"));
+
+        //check that recursion works
+        assertTrue(fm.matches("apple","[tag:fruit]"));
+        assertTrue(fm.matches("an apple","[tag:fruit]"));
+        assertTrue(fm.matches("an an apple","[tag:fruit]"));
+        assertTrue(fm.matches("an a an apple","[tag:fruit]"));
+        assertTrue(fm.matches("an an an an an an a an apple","[tag:fruit]"));
+
+        //check that it works even after removing and adding back the terminal
+        fm.removeTagRule("fruit","id_apple");
+        fm.addTagRule("fruit", "apple", "id_apple");
+
+        assertTrue(fm.matches("apple","[tag:fruit]"));
+        assertTrue(fm.matches("an apple","[tag:fruit]"));
+        assertTrue(fm.matches("an an apple","[tag:fruit]"));
+
+
+        //now check it's working on rules calling in turn
+        fm.addTagRule("clockwise", "clockwise", "id_c");
+        fm.addTagRule("anticlockwise", "anticlockwise", "id_ac");
+        fm.addTagRule("clockwise", "anti[tag:anticlockwise]", "id_cr");
+        fm.addTagRule("anticlockwise", "anti[tag:clockwise]", "id_acr");
+
+        assertTrue(fm.matches("clockwise","[tag:clockwise]"));
+        assertTrue(fm.matches("antianticlockwise","[tag:clockwise]"));
+        assertFalse(fm.matches("anticlockwise","[tag:clockwise]"));
+        assertTrue(fm.matches("antiantiantianticlockwise","[tag:clockwise]"));
+        assertTrue(fm.matches("antiantiantiantiantianticlockwise","[tag:clockwise]"));
+        assertFalse(fm.matches("antiantiantiantianticlockwise","[tag:clockwise]"));
+
+        fm.removeTagRule("clockwise","id_cr");
+        fm.addTagRule("clockwise", "anti[tag:anticlockwise]", "id_cr");
+
+        assertTrue(fm.matches("clockwise","[tag:clockwise]"));
+        assertTrue(fm.matches("antianticlockwise","[tag:clockwise]"));
+        assertFalse(fm.matches("anticlockwise","[tag:clockwise]"));
+        assertTrue(fm.matches("antiantiantianticlockwise","[tag:clockwise]"));
+        assertTrue(fm.matches("antiantiantiantiantianticlockwise","[tag:clockwise]"));
+        assertFalse(fm.matches("antiantiantiantianticlockwise","[tag:clockwise]"));
+
+        assertTrue(fm.matches("an an apple","[tag:fruit]"));
+        assertTrue(fm.matches("an an apple","[tag:fruit]"));
+
+
+        //generated expressions effectively match the pattern
+        for(int i=1; i<20; i++){
+            String sample = fm.generateSample("[tag:clockwise]");
+            assertTrue(fm.matches(sample,"[tag:clockwise]"));
+
+            sample = fm.generateSample("try a [tag:fruit]");
+            assertTrue(fm.matches(sample,"try a [tag:fruit]"));
+        }
+
+
 		AnnotationHandler ah = new DefaultAnnotationHandler();
 		//match substrings, it will match both "an apple" and "apple"
 		MatchingResults res = fm.matches("an apple", "[tag:fruit]",ah, true,false,true);

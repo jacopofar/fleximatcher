@@ -9,5 +9,11 @@ public interface RuleFactory {
      * @param parameter the parameter used in pattern definition, if any, or an empty string in case of no parameter
      * @return a MatchingRule which annotates using the given parameter
      */
-	public MatchingRule getRule(String parameter);
+	 MatchingRule getRule(String parameter);
+    /**
+     * Returns an example of text matching the parameter, if possible, or null
+     * @param parameter the parameter used in pattern definition, if any, or an empty string in case of no parameter
+
+     * */
+     String generateSample(String parameter);
 }

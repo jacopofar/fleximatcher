@@ -16,5 +16,8 @@ public class MultiRuleFactory implements RuleFactory {
 	public MatchingRule getRule(String parameter) {
 		return new MultiRule(parameter,fm);
 	}
-
+	@Override
+	public String generateSample(String parameter) {
+		return null;
+	}
 }

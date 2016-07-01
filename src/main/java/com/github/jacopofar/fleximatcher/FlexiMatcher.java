@@ -179,8 +179,11 @@ public final class FlexiMatcher {
     public boolean isBoundRule(String ruleName) {
         return rules.containsKey(ruleName);
     }
-    
-    
+
+    public RuleFactory getBoundRule(String ruleName) {
+        return rules.get(ruleName);
+    }
+
     public void clearTags() {
         factory.clearRules();
     }
@@ -232,5 +235,27 @@ public final class FlexiMatcher {
         Stream<RuleDefinition> ts = factory.getTagDefinitions(tagName);
         if (ts == null) return Optional.empty();
         return ts.filter(r -> r.getIdentifier().equals(ruleId)).findFirst();
+    }
+
+    public String generateSample(String pattern){
+        String result = "";
+        for(String part:ExpressionParser.split(pattern)){
+            if(!part.startsWith("[")){
+                result += part;
+                continue;
+            }
+            RuleFactory r = getBoundRule(ExpressionParser.ruleName(part));
+            if(r == null){
+                result += part;
+                continue;
+            }
+            String samplePart = r.generateSample(ExpressionParser.getParameter(part));
+            //use the generated part, or the original pattern as a placeholder
+            if (samplePart == null)
+                result += part;
+            else
+                result += samplePart;
+        }
+        return result;
     }
 }

@@ -21,4 +21,5 @@ public abstract class MatchingRule {
 	 * @ah the AnnotationHandler to use to annotate the text
 	 * */
 	public abstract boolean annotate(String text, AnnotationHandler ah);
+
 }
