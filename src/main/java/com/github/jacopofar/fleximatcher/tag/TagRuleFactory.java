@@ -69,7 +69,7 @@ public class TagRuleFactory implements RuleFactory {
             LinkedList<RuleDefinition> p = new LinkedList<>();
             p.add(new RuleDefinition(pattern,identifier,annotationTemplate));
             rules.put(tag, p);
-            return true;
+            return false;
         }
     }
 
