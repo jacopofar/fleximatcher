@@ -148,33 +148,31 @@ public class TagRuleFactory implements RuleFactory {
     public String generateSample(String parameter) {
         int numCandidates = rules.get(parameter).size();
         if(numCandidates == 0) return null;
-        int chosen = (int) Math.floor(Math.random() * (numCandidates+1));
-        for(RuleDefinition c: rules.get(parameter)){
-            chosen--;
-            if(chosen > 0) continue;
-            String result = "";
-            for(String part:ExpressionParser.split(c.getPattern())){
-                String ruleName = ExpressionParser.ruleName(part);
-                if(ruleName.isEmpty()){
-                    //it's plain text, just use it
-                    result += ruleName;
-                    continue;
-                }
-                RuleFactory boundRule = matcher.getBoundRule(ruleName);
-                //no bound rule? leave the rule part as a placeholder
-                if(boundRule == null){
-                    result += part;
-                    continue;
-                }
-                String samplePart = boundRule.generateSample(ExpressionParser.getParameter(part));
-                //use the generated part, or the original pattern as a placeholder
-                if (samplePart == null)
-                    result += part;
-                else
-                    result += samplePart;
+        int chosen = (int) Math.floor(Math.random() * (numCandidates));
+        RuleDefinition c = rules.get(parameter).get(chosen);
+
+        String result = "";
+        for(String part:ExpressionParser.split(c.getPattern())){
+            String ruleName = ExpressionParser.ruleName(part);
+            if(ruleName.isEmpty()){
+                //it's plain text, just use it
+                result += ruleName;
+                continue;
             }
-            return result;
+            RuleFactory boundRule = matcher.getBoundRule(ruleName);
+            //no bound rule? leave the rule part as a placeholder
+            if(boundRule == null){
+                result += part;
+                continue;
+            }
+            String samplePart = boundRule.generateSample(ExpressionParser.getParameter(part));
+            //use the generated part, or the original pattern as a placeholder
+            if (samplePart == null)
+                result += part;
+            else
+                result += samplePart;
         }
-        return "ehm... something embarrassingly wrong happened here...";
+        return result;
+
     }
 }
