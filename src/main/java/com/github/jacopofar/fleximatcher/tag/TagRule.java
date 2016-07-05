@@ -40,7 +40,6 @@ public class TagRule extends MatchingRule {
                 //don't waste time matching it again
                 //and don't throw maximum nesting exceptions
                 return false;
-
             }
         }
         ruleFactory.getTagPatterns(name).forEach(pat->{

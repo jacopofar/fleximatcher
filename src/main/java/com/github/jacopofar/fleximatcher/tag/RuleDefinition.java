@@ -1,18 +1,22 @@
 package com.github.jacopofar.fleximatcher.tag;
 
 import com.github.jacopofar.fleximatcher.annotations.TextAnnotation;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class RuleDefinition {
     
     private final String pattern;
     private final String identifier;
+
+    public String getAnnotationExpression() {
+        return annotationExpression;
+    }
+
     private String annotationExpression;
     public RuleDefinition(String pattern, String identifier) {
         this.pattern=pattern;
