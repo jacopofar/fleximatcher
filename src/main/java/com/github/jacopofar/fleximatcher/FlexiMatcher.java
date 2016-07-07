@@ -7,6 +7,7 @@ import com.github.jacopofar.fleximatcher.annotations.ResultPrintingAnnotationHan
 import com.github.jacopofar.fleximatcher.expressions.ExpressionParser;
 import com.github.jacopofar.fleximatcher.rule.RegexRuleFactory;
 import com.github.jacopofar.fleximatcher.rule.RuleFactory;
+import com.github.jacopofar.fleximatcher.rule.SingleCharRuleFactory;
 import com.github.jacopofar.fleximatcher.rules.InsensitiveCaseRuleFactory;
 import com.github.jacopofar.fleximatcher.rules.MatchingRule;
 import com.github.jacopofar.fleximatcher.rules.MultiRuleFactory;
@@ -105,6 +106,7 @@ public final class FlexiMatcher {
         this.bind("r", new RegexRuleFactory());
         this.bind("i", new InsensitiveCaseRuleFactory());
         this.bind("multi", new MultiRuleFactory(this));
+        this.bind("char", new SingleCharRuleFactory());
         factory=new TagRuleFactory(this);
         this.bind("tag", factory);
     }

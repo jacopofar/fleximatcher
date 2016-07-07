@@ -27,28 +27,31 @@ will call the rule mapped with the name "_en-isa_" with the parameter "_animal_"
 
 Text outside squared brackets will be matched exactly against the string.
 
-Some rules are already defined: i,r,multi and tag:
+Some rules are already defined: i, r, multi, char and tag:
 
 __i__ matches case insensitive text, using the Locale of the machine to do the comparison
 
-[i:hello world] matches "hello world", "HELLO WORLD", "HelLo WorLD"
+`[i:hello world]` matches "hello world", "HELLO WORLD", "HelLo WorLD"
 
 __r__ matches against Java regular expressions
-_[r:[AX][1-9][0-9]*]_ matches "A12", "X299", "A2" but not "A01" or "E38"
+_`[r:[AX][1-9][0-9]*]`_ matches "A12", "X299", "A2" but not "A01" or "E38"
 
 __multi__ matches many rules with the same substring
 
-_[multi:[[r:a[0-9]+[bB]+][i:a3b]]]_ will match "a3b", "a3B" but not "A3b" (it does not match the first rule) nor "a4b" (does not match the first rule). Given the text "a3BbB" it will match the first 3 characters, because the first rule match the string in many ways but only the first three characters are matched by the second one.
+_`[multi:[[r:a[0-9]+[bB]+][i:a3b]]]`_ will match "a3b", "a3B" but not "A3b" (it does not match the first rule) nor "a4b" (does not match the first rule). Given the text "a3BbB" it will match the first 3 characters, because the first rule match the string in many ways but only the first three characters are matched by the second one.
 
 "a3bbBba3B" will be matched by the multi rule two times, at the first and the last two characters.
 
 Note that in this example the result of multi is the same of [r:[aA]3[bB]], it is more useful when used to combine custom rules.
 
+__char__ tag a specific Unicode code point, including ones mapped to surrogate pairs.
+`[char:0x1F01C]` so will match that character, you can use decimal numbers or hex with the "0x" suffic
+
 __tag__ is a rule used to match substrings against previously defined tags.
 For example, if we can define the following mappings:
 
-animals=>cats
-animals=>cats
+animals => cats
+animals => cats
 
 then match the string "I like [tag:animals]" to match "I like cats". Tags can be recursive, so we can define also:
 
@@ -204,7 +207,7 @@ Rules must be thread safe, or strange, nasty, errors may happen when parsing a t
 
 Retrieve the results
 ---------------------
-The most flexile method used to match patterns against a text is this:
+The most flexible method used to match patterns against a text is this:
 
 
 		/**

@@ -85,8 +85,23 @@ public class TestBasic {
 		assertTrue("nested multi",fm.matches("AbC", "A[multi:[r:[bD]+][i:B][multi:b]]C",ah, true,true,true).isMatching());
 		assertEquals("number of annotations:",8.0,ah.getAnnotationsCount(),0.0);
         assertEquals("A[multi:[r:[bD]+][i:B]]C", fm.generateSample("A[multi:[r:[bD]+][i:B]]C"));
-
 	}
+
+	@Test
+	public void testChar() {
+		assertTrue("identity",fm.matches("AbC", "AbC"));
+		assertTrue(fm.matches("AbC", "A[char:98]C"));
+        assertTrue(fm.matches("AbC", "A[char:0x62]C"));
+
+        assertTrue(fm.matches("aaèr", "aa[char:0xe8]r"));
+        assertTrue(fm.matches("aaèr", "aa[char:0xE8]r"));
+
+        assertFalse(fm.matches("aaér", "aa[char:0xe8]r"));
+        assertFalse(fm.matches("aaér", "aa[char:0xE8]r"));
+        //U+1f617 is an emoji, and in UTF-16 becomes a surrogate pair
+        assertTrue(fm.matches("the emoji " + new String(Character.toChars(Integer.parseInt("1f617",16))) + " works, too", "the emoji [char:0x1f617] works, too"));
+
+    }
 
 	@Test
 	public void testTag() {
