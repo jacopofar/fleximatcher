@@ -30,6 +30,7 @@ public class RuleDefinition {
         } catch (JSONException e) {
             throw new RuntimeException("Error, the string '"+annotationExpression+"' is not a valid JSON string!");
         }
+        //TODO also check that the expression doesn't try to annotate something out of index, for example the pattern 'a[r:b]c' and the annotation {x:#4#}
         this.pattern=pattern;
         this.identifier=identifier;
         this.annotationExpression=annotationExpression;
@@ -71,24 +72,29 @@ public class RuleDefinition {
     public JSONObject getResultingAnnotation(String text,LinkedList<TextAnnotation> matchSequence) {
         if(annotationExpression==null)
             return null;
-        String result=annotationExpression;
+        //System.out.println("matching annotation expression " + annotationExpression + " on sequences " + matchSequence.toString());
+        String result = annotationExpression;
         Pattern p = Pattern.compile("#([0-9]+[^#]*)#");
         Matcher m = p.matcher(annotationExpression);
         while(m.find()){
-            String expr=m.group(1);
+            String expr = m.group(1);
             if(expr.matches("[0-9]+")){
-                String content=JSONObject.quote(matchSequence.get(Integer.parseInt(expr)).getSpan().getCoveredText(text).toString());
+                //System.out.println("expression: " +expr + "for group " + m.toString());
+                String content=JSONObject.quote(
+                        matchSequence.get(Integer.parseInt(expr)).getSpan().getCoveredText(text).toString()
+                );
                 result=result.replace(m.group(), content);
             }
             else
                 if(expr.matches("[0-9]+\\..+")){
                     String content;
                     int position=Integer.parseInt(expr.replaceAll("\\..+", ""));
+                   // System.out.println("expression: " +expr + " position: " + position + " for group " + m.toString());
                     try {
                         content = JSONObject.quote(matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")));
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        throw new RuntimeException("---------error while creating the annotation for "+expr.replaceAll("[0-9]+\\.", ""));
+                        throw new RuntimeException("error while creating the annotation for " + expr.replaceAll("[0-9]+\\.", "") + " using expression " + annotationExpression +  " : " + e.getMessage());
                     }
                     //if the content is empty, explicitly use an empty string
                     //we could have patterns in the form #x##y#, that have been transformed in 'string1''string2', we have to remove the double quotes between them

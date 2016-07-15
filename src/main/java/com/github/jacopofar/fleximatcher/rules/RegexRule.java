@@ -28,7 +28,7 @@ public class RegexRule extends MatchingRule {
 			}
 			m.reset();
 			while(m.find()){
-				if(m.start() != m.end()) {
+                if(m.start() != m.end()) {
 					ah.addAnnotation(new Span(m.start(),m.end()),null);
 				}
 				for(int start=m.start();start<m.end()+1;start++)
