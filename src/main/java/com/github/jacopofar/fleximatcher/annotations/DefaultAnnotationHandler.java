@@ -34,9 +34,9 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         if(!annotationsForTag.contains(currentMatcher))
             annotationsForTag.put(currentMatcher, new HashSet<>());
         annotationsForTag.get(currentMatcher).add(ta);
-        
+
     }
-    
+
     @Override
     public int getAnnotationsCount() {
         return numAnnotations;
@@ -51,10 +51,10 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         /*
         * The method is very simple:
         * the startPosition set contains the starting points (initially just 0, or any possible position for matchWhole=false)
-        * Iterate on the rules to match and look for ones that start frome one of the starting position
+        * Iterate on the rules to match and look for ones that start from one of the starting position
         * for each of them add at the ending positions to a new set of positions
         * if this new set stays empty, return false
-        * if this set has some element, swap it with the startint positions set and go to the next rule
+        * if this set has some element, swap it with the starting positions set and go to the next rule
         *
         * If after checking all the rules the set contains length (that is, the last rule ends with at the expected position)
         * */
@@ -63,7 +63,7 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         if(populateResult){
             //this will map a final positions with the lists of length K when matching the K+1 part
             candidateAnnotations=new ConcurrentHashMap<>(30);
-            
+
         }
         startPositions.add(0);
         if(!matchWhole){
@@ -75,29 +75,31 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
             ConcurrentHashMap<Integer,HashSet<LinkedList<TextAnnotation>>> newCandidateAnnotations=new ConcurrentHashMap<>(30);
             for(int startCandidate:startPositions){
                 for(TextAnnotation ann:annotationsStored.getOrDefault(startCandidate, new HashSet<>())){
-                    if(ann.getType().equals(p)){
-                        newStartPositions.add(ann.getSpan().getEnd());
-                        if(populateResult){
-                            if(firstStep){
-                                HashSet<LinkedList<TextAnnotation>> expandMe = newCandidateAnnotations.getOrDefault(ann.getSpan().getEnd(), new HashSet<>());
-                                expandMe.add(new LinkedList<>(Arrays.asList(new TextAnnotation[]{ann})));
-                                newCandidateAnnotations.put(ann.getSpan().getEnd(),expandMe);
-                            }
-                            else{
-                                HashSet<LinkedList<TextAnnotation>> expandUs = candidateAnnotations.get(ann.getSpan().getStart());
-                                if(expandUs==null)
-                                    continue;
-                                expandUs.stream().forEach((l) -> {
-                                    l.addLast(ann);
-                                });
-                                if(newCandidateAnnotations.containsKey(ann.getSpan().getEnd())){
-                                    newCandidateAnnotations.get(ann.getSpan().getEnd()).addAll(expandUs);
-                                }
-                                else
-                                    newCandidateAnnotations.put(ann.getSpan().getEnd(),expandUs);
-                            }
-                        }
+                    if(!ann.getType().equals(p))
+                        continue;
+                    newStartPositions.add(ann.getSpan().getEnd());
+                    if(!populateResult)
+                        continue;
+                    if(firstStep){
+                        //first step: for each possible first element, create an interpretation
+                        HashSet<LinkedList<TextAnnotation>> expandMe = newCandidateAnnotations.getOrDefault(ann.getSpan().getEnd(), new HashSet<>());
+                        expandMe.add(new LinkedList<>(Arrays.asList(new TextAnnotation[]{ann})));
+                        newCandidateAnnotations.put(ann.getSpan().getEnd(),expandMe);
                     }
+                    else{
+                        HashSet<LinkedList<TextAnnotation>> expandUs = candidateAnnotations.get(startCandidate);
+                        if(expandUs==null)
+                            continue;
+                        expandUs.stream().forEach((l) -> {
+                            l.addLast(ann);
+                        });
+                        if(newCandidateAnnotations.containsKey(ann.getSpan().getEnd())){
+                            newCandidateAnnotations.get(ann.getSpan().getEnd()).addAll(expandUs);
+                        }
+                        else
+                            newCandidateAnnotations.put(ann.getSpan().getEnd(),expandUs);
+                    }
+
                 }
             }
             firstStep=false;
@@ -119,12 +121,12 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         }
         return MatchingResults.noMatch();
     }
-    
+
     @Override
     public Stream<Entry<Integer,Set<TextAnnotation>>> getAnnotationsPositionalStream() {
         return annotationsStored.entrySet().stream();
     }
-    
+
     @Override
     public AnnotationHandler getSubHandler(String newCurrentMatcher) {
         return new DefaultSubHandler(this,newCurrentMatcher);
@@ -133,15 +135,15 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
     public int getNestingLevel() {
         return 0;
     }
-    
+
     @Override
     public List<String> getAncestorsMatchers() {
-       return ImmutableList.of(currentMatcher);
+        return ImmutableList.of(currentMatcher);
     }
-    
+
     @Override
     public List<Integer> getAncestorsAnnotationCountersAtCreationTime() {
         return ImmutableList.of(0);
     }
-    
+
 }       

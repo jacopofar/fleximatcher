@@ -17,7 +17,7 @@ public class ResultPrintingAnnotationHandler extends DefaultAnnotationHandler {
 	@Override
 	public void addAnnotation(Span span,JSONObject json) {
 		super.addAnnotation(span,json);
-		System.out.println("Added an annotation for the tag '"+this.getCurrentMatcher()+ "' at "+span+": to '"+span.getCoveredText(text)+"'"+json);
+		System.out.println(this.getNestingLevel() + " Added an annotation for the tag '"+this.getCurrentMatcher()+ "' at "+span+": to '"+span.getCoveredText(text)+"'"+json);
 	}
 
 	public void setCurrentMatcher(String rule){

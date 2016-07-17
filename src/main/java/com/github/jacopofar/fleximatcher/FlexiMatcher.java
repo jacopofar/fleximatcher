@@ -43,7 +43,7 @@ public final class FlexiMatcher {
      * @param matchWhole if true, will match the pattern against the whole text, if false will search for it inside the string.
      * @param populateResult if true, will populate the results, if false it will only check whether there is a match or not.
      * The difference between fullyAnnotate and populateResult is that the former can stop the annotation process, the latter stops the generation of the results but let the annotation handler receive the annotations found.
-     * @return a MatchingResults reporting whether there was a match or not and, when requested, the annotations and 
+     * @return a MatchingResults reporting whether there was a match or not and, when requested, the interpretations and the corresponding annotations
      * */
     public MatchingResults matches(String text, String pattern, AnnotationHandler ah, boolean fullyAnnotate, boolean matchWhole, boolean populateResult){
         String[] ruleParts = ExpressionParser.split(pattern);

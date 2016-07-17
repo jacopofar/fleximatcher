@@ -39,12 +39,13 @@ public class TagRule extends MatchingRule {
                 //ancestor with the same pattern and same amount of annotations and same pattern
                 //don't waste time matching it again
                 //and don't throw maximum nesting exceptions
+                System.out.println(" +++ stopping this branch because of the no-new-tags rule");
                 return false;
             }
         }
         ruleFactory.getTagPatterns(name).forEach(pat->{
-            //ah.getAnnotationsPositionalStream().forEach(a -> System.out.println("   " + a.getValue()));
-            //System.out.println(" ++ sub matching '" + pat.getPattern() + "' for tag '" + name + "' and text '" + text + "' at level " + ah.getNestingLevel());
+            ah.getAnnotationsPositionalStream().forEach(a -> System.out.println("  .  " + a.getValue()));
+            System.out.println(" ++ sub matching '" + pat.getPattern() + "' for tag '" + name + "' and text '" + text + "' at level " + ah.getNestingLevel());
             AnnotationHandler sa = ah.getSubHandler(pat.getPattern());
             //to avoid cycles during matching, let's look for ancestor matchers with the same pattern and the same amount of annotations at beginning
             //if there is another one, this one will not produce anything and we'll discard it
@@ -85,9 +86,9 @@ public class TagRule extends MatchingRule {
                             e.printStackTrace();
                         }
                     }
-                    //System.out.println(" ++ effectively found a match in span " + matchSequence.getFirst().getSpan().getStart() + " - " + matchSequence.getLast().getSpan().getEnd() + " at level " + ah.getNestingLevel());
+                    System.out.println(" ++ effectively found a match in span " + matchSequence.getFirst().getSpan().getCoveredText(text) + " at level " + ah.getNestingLevel());
 
-                    //System.out.println("--+"+ah.getNestingLevel()+" that pattern ("+pat+") matches with the sequence: "+matchSequence+(annotation==null?"":" annotation: "+annotation.toString()));
+                    System.out.println("-- " + ah.getNestingLevel() + " that pattern ("+pat.getPattern()+") matches with the sequence: "+matchSequence+(annotation==null?"":" annotation: "+annotation.toString()));
                     //there's a match, let's annotate it
                     ah.addAnnotation(new Span(matchSequence.getFirst().getSpan().getStart(),matchSequence.getLast().getSpan().getEnd()), annotation);
                 });

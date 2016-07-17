@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,6 +96,9 @@ public class RuleDefinition {
                     } catch (JSONException e) {
                         e.printStackTrace();
                         throw new RuntimeException("error while creating the annotation for " + expr.replaceAll("[0-9]+\\.", "") + " using expression " + annotationExpression +  " : " + e.getMessage());
+                    }
+                    catch (NoSuchElementException e){
+                        throw new RuntimeException("error while retrieving the existing annotations in " + expr.replaceAll("[0-9]+\\.", "") + " using expression " + annotationExpression +  " : " + e.getMessage());
                     }
                     //if the content is empty, explicitly use an empty string
                     //we could have patterns in the form #x##y#, that have been transformed in 'string1''string2', we have to remove the double quotes between them
