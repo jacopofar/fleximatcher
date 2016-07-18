@@ -36,6 +36,9 @@ public class TestAnnotations {
 
 
         String multiple = "aaa";
+        //not passing?
+        //String multiple = "aaaa";
+        //not passing when adding a , to the pattern definition
         //String multiple = "a,a,a";
 
         MatchingResults res = fm.matches(multiple, "[tag:letters]", FlexiMatcher.getDefaultAnnotator(), true, true, true);
