@@ -21,7 +21,7 @@ public class TagRule extends MatchingRule {
         this.ruleFactory=tagRuleFactory;
         this.name=tagName;
     }
-
+//TODO see the paper at http://hafiz.myweb.cs.uwindsor.ca/pub/p46-frost.pdf and try implement it
     @Override
     public boolean annotate(String text, AnnotationHandler ah) {
         //System.out.println("--"+ah.getNestingLevel()+" TAG RULE: asked to annotate '"+text+"', I'm the rule "+name);

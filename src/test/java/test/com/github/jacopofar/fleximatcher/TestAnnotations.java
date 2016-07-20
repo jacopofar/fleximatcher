@@ -47,7 +47,6 @@ public class TestAnnotations {
         }
         else{
             System.out.println("is NOT matching :(");
-
         }
         res.getAnnotations().ifPresent(ints -> {
             System.out.println(" there are " + ints.size() + " interpretations");
