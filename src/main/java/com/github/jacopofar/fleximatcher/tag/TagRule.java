@@ -71,7 +71,7 @@ public class TagRule extends MatchingRule {
                                 childExplanation.put("start",ta.getSpan().getStart());
                                 childExplanation.put("end",ta.getSpan().getEnd());
                                 childExplanation.put("type",ta.getType());
-
+                                //add annotation for each matched tag in the pattern
                                 ta.getJSON().flatMap(j -> Optional.ofNullable(j.optJSONObject("__explain")))
                                         .ifPresent(e -> {
                                             try {
