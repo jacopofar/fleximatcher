@@ -25,7 +25,6 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
 
     @Override
     public void addAnnotation(Span span, JSONObject attributes) {
-        numAnnotations++;
         if(!annotationsStored.containsKey(span.getStart())){
             annotationsStored.put(span.getStart(), new HashSet<>());
         }
@@ -33,7 +32,13 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         annotationsStored.get(span.getStart()).add(ta);
         if(!annotationsForTag.contains(currentMatcher))
             annotationsForTag.put(currentMatcher, new HashSet<>());
-        annotationsForTag.get(currentMatcher).add(ta);
+        //System.out.println("annotations before:" + annotationsForTag.get(currentMatcher));
+
+        if(annotationsForTag.get(currentMatcher).add(ta)){
+            numAnnotations++;
+           // System.out.println("adding a new annotation, " + currentMatcher + ta.toString());
+           // System.out.println("annotations now:" + annotationsForTag.get(currentMatcher));
+        }
 
     }
 
