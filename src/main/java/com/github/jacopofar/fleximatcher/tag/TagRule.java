@@ -12,16 +12,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class TagRule extends MatchingRule {
+class TagRule extends MatchingRule {
 
     private final TagRuleFactory ruleFactory;
     private final String name;
 
-    public TagRule(TagRuleFactory tagRuleFactory, String tagName) {
+    TagRule(TagRuleFactory tagRuleFactory, String tagName) {
         this.ruleFactory=tagRuleFactory;
         this.name=tagName;
     }
-    //TODO see the paper at http://hafiz.myweb.cs.uwindsor.ca/pub/p46-frost.pdf and try implement it
+    //TODO maybe see the paper at http://hafiz.myweb.cs.uwindsor.ca/pub/p46-frost.pdf and try implement it
+    //for now, no issues were found
     @Override
     public boolean annotate(String text, AnnotationHandler ah) {
         //System.out.println("--"+ah.getNestingLevel()+" TAG RULE: asked to annotate '"+text+"', I'm the rule "+name);
@@ -39,20 +40,14 @@ public class TagRule extends MatchingRule {
                 //ancestor with the same pattern and same amount of annotations and same pattern
                 //don't waste time matching it again
                 //and don't throw maximum nesting exceptions
-                System.out.println(" +++ stopping this branch because of the no-new-tags rule");
+                //System.out.println(" +++ stopping this branch because of the no-new-tags rule");
                 return false;
             }
         }
         while(true){
             int beforeCycle = ah.getAnnotationsCount();
-            System.out.println("\nannotations before the cycle: " + beforeCycle);
-            if(beforeCycle == 17){
-                System.out.println("argh");
-            }
-            ah.getAnnotationsPositionalStream().forEach(ap->{
-                System.out.println(ap.getKey() + ":");
-                ap.getValue().stream().forEach(a -> System.out.println("  " + a));
-            });
+            //System.out.println("\nannotations before the cycle, nesting " + ah.getNestingLevel() + ", matching " + ah.getCurrentMatcher() + ": " + beforeCycle);
+
             ruleFactory.getTagPatterns(name).forEach(pat->{
                 ah.getAnnotationsPositionalStream().forEach(a ->{
 
@@ -67,20 +62,20 @@ public class TagRule extends MatchingRule {
                 Optional<Set<LinkedList<TextAnnotation>>> subMatches = ruleFactory.getMatcher().matches(text, pat.getPattern(), sa, false, false,true).getAnnotations();
 
                 if(subMatches.isPresent()){
-                    subMatches.get().stream().forEach((matchSequence) -> {
-                        JSONObject annotation=pat.getResultingAnnotation(text,matchSequence);
-                        if(ah.requiresExplanation()){
-                            if (annotation == null){
+                    subMatches.get().forEach((matchSequence) -> {
+                        JSONObject annotation = pat.getResultingAnnotation(text, matchSequence);
+                        if (ah.requiresExplanation()) {
+                            if (annotation == null) {
                                 annotation = new JSONObject();
                             }
                             try {
                                 JSONObject explanation = new JSONObject();
-                                explanation.put("id",pat.getIdentifier());
-                                for(TextAnnotation ta: matchSequence){
+                                explanation.put("id", pat.getIdentifier());
+                                for (TextAnnotation ta : matchSequence) {
                                     JSONObject childExplanation = new JSONObject();
-                                    childExplanation.put("start",ta.getSpan().getStart());
-                                    childExplanation.put("end",ta.getSpan().getEnd());
-                                    childExplanation.put("type",ta.getType());
+                                    childExplanation.put("start", ta.getSpan().getStart());
+                                    childExplanation.put("end", ta.getSpan().getEnd());
+                                    childExplanation.put("type", ta.getType());
                                     //add annotation for each matched tag in the pattern
                                     ta.getJSON().flatMap(j -> Optional.ofNullable(j.optJSONObject("__explain")))
                                             .ifPresent(e -> {
@@ -102,13 +97,12 @@ public class TagRule extends MatchingRule {
                         //--System.out.println(" ++ effectively found a match in span '" + matchSequence.getFirst().getSpan().getCoveredText(text) + "' at level " + ah.getNestingLevel());
                         //--System.out.println(" -- " + ah.getNestingLevel() + " that pattern ("+pat.getPattern()+") matches with the sequence: "+matchSequence+(annotation==null?"":" annotation: "+annotation.toString()));
                         //there's a match, let's annotate it
-                        ah.addAnnotation(new Span(matchSequence.getFirst().getSpan().getStart(),matchSequence.getLast().getSpan().getEnd()), annotation);
+                        ah.addAnnotation(new Span(matchSequence.getFirst().getSpan().getStart(), matchSequence.getLast().getSpan().getEnd()), annotation);
                     });
                 }
             });
-            System.out.println("annotations now: " + ah.getAnnotationsCount() + ", before: " + beforeCycle);
+            //System.out.println("annotations now: " + ah.getAnnotationsCount() + ", before the cycle: " + beforeCycle);
             if(ah.getAnnotationsCount() == beforeCycle) break;
-            beforeCycle = ah.getAnnotationsCount();
         }
 
         return ah.checkAnnotationSequence(new String[]{"[tag:"+name+"]"}, text.length(), true,false).isMatching();
