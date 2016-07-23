@@ -35,9 +35,9 @@ public class TestAnnotations {
         fm.addTagRule("letters", "[tag:letter][tag:letters]","letters_2");
 
 
-        //String multiple = "aaa";
+        String multiple = "aaa";
         //not passing?
-        String multiple = "aaaa";
+        //String multiple = "aaaa";
         //not passing when adding a , to the pattern definition
         //String multiple = "a,a,a";
 

@@ -83,7 +83,21 @@ public class TestBasic {
 		assertFalse(fm.matches("AbC", "ABC"));
 		ResultPrintingAnnotationHandler ah = new ResultPrintingAnnotationHandler("AbC");
 		assertTrue("nested multi",fm.matches("AbC", "A[multi:[r:[bD]+][i:B][multi:b]]C",ah, true,true,true).isMatching());
-		assertEquals("number of annotations:",8.0,ah.getAnnotationsCount(),0.0);
+		/*
+		Expected annotations:
+
+		position 0:
+		   A:[0..1)
+		position 1:
+          [r:[bD]+]:[1..2)
+          [i:B]:[1..2)
+          b:[1..2)
+          [multi:b]:[1..2)
+          [multi:[r:[bD]+][i:B][multi:b]]:[1..2)
+		position 2:
+		   C:[2..3)
+*/
+		assertEquals("number of annotations:",7.0,ah.getAnnotationsCount(),0.0);
         assertEquals("A[multi:[r:[bD]+][i:B]]C", fm.generateSample("A[multi:[r:[bD]+][i:B]]C"));
 	}
 
