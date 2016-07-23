@@ -30,14 +30,14 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         }
         TextAnnotation ta = new TextAnnotation(span,currentMatcher,attributes);
         annotationsStored.get(span.getStart()).add(ta);
-        if(!annotationsForTag.contains(currentMatcher))
+        if(!annotationsForTag.containsKey(currentMatcher))
             annotationsForTag.put(currentMatcher, new HashSet<>());
-        //System.out.println("annotations before:" + annotationsForTag.get(currentMatcher));
+        //System.out.println("tag: " + currentMatcher + " - annotations before:" + annotationsForTag);
 
         if(annotationsForTag.get(currentMatcher).add(ta)){
             numAnnotations++;
-           // System.out.println("adding a new annotation, " + currentMatcher + ta.toString());
-           // System.out.println("annotations now:" + annotationsForTag.get(currentMatcher));
+            //System.out.println("adding a new annotation for " + currentMatcher + " " + ta.toString());
+            //System.out.println("annotations now:" + annotationsForTag.get(currentMatcher));
         }
 
     }
