@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -68,7 +69,6 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
         if(populateResult){
             //this will map a final positions with the lists of length K when matching the K+1 part
             candidateAnnotations=new ConcurrentHashMap<>(30);
-
         }
         startPositions.add(0);
         if(!matchWhole){
@@ -88,21 +88,24 @@ public class DefaultAnnotationHandler extends AnnotationHandler {
                     if(firstStep){
                         //first step: for each possible first element, create an interpretation
                         HashSet<LinkedList<TextAnnotation>> expandMe = newCandidateAnnotations.getOrDefault(ann.getSpan().getEnd(), new HashSet<>());
-                        expandMe.add(new LinkedList<>(Arrays.asList(new TextAnnotation[]{ann})));
+                        expandMe.add(new LinkedList<>(Arrays.asList(ann)));
                         newCandidateAnnotations.put(ann.getSpan().getEnd(),expandMe);
                     }
                     else{
-                        HashSet<LinkedList<TextAnnotation>> expandUs = candidateAnnotations.get(startCandidate);
-                        if(expandUs==null)
+                        //TODO here's a bug: I can have more than 1 continuation, and have to create multiple candidates for them
+                        HashSet<LinkedList<TextAnnotation>> expandible = candidateAnnotations.get(startCandidate);
+                        if(expandible==null)
                             continue;
-                        expandUs.stream().forEach((l) -> {
-                            l.addLast(ann);
-                        });
-                        if(newCandidateAnnotations.containsKey(ann.getSpan().getEnd())){
-                            newCandidateAnnotations.get(ann.getSpan().getEnd()).addAll(expandUs);
+                        List<LinkedList<TextAnnotation>> expansions = expandible.stream().map((l) -> {
+                            LinkedList<TextAnnotation> expansion = (LinkedList<TextAnnotation>) l.clone();
+                            expansion.addLast(ann);
+                            return expansion;
+                        }).collect(Collectors.toList());
+                        if(!newCandidateAnnotations.containsKey(ann.getSpan().getEnd())){
+                            newCandidateAnnotations.put(ann.getSpan().getEnd(), new HashSet<>());
                         }
-                        else
-                            newCandidateAnnotations.put(ann.getSpan().getEnd(),expandUs);
+                        newCandidateAnnotations.get(ann.getSpan().getEnd()).addAll(expansions);
+
                     }
 
                 }
