@@ -32,14 +32,12 @@ public class TestAnnotations {
         //fm.addTagRule("letters", "[tag:letter],[tag:letters]", "letters_2","{'letters':[#0.letter#, #2.letters#]}");
 
         fm.addTagRule("letters", "[tag:letter]", "letters_1");
-        fm.addTagRule("letters", "[tag:letter][tag:letters]","letters_2");
+        fm.addTagRule("letters", "[tag:letter],[tag:letters]","letters_2");
 
 
         //String multiple = "aaa";
-        //not passing?
-        String multiple = "aaaa";
-        //not passing when adding a , to the pattern definition
-        //String multiple = "a,a,a";
+       // String multiple = "aaaaaaa";
+        String multiple = "a,a,a,a,a,a,a";
 
         MatchingResults res = fm.matches(multiple, "[tag:letters]", FlexiMatcher.getDefaultAnnotator(), true, true, true);
         if(res.isMatching()){
@@ -56,9 +54,7 @@ public class TestAnnotations {
                     }
             );
         });
-        res.getFlatAnnotations().forEach(a -> {
-            System.out.println("      " + a.getJSON().toString());
-        });
+        res.getFlatAnnotations().forEach(a -> System.out.println("      " + a.getJSON().toString()));
         //TODO define a complete test batch for annotations, but first decide how to define them consistently
     }
 }
