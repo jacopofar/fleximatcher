@@ -43,9 +43,16 @@ public class TagRule extends MatchingRule {
                 return false;
             }
         }
-        int beforeCycle = ah.getAnnotationsCount();
         while(true){
-            System.out.println("annotations  before the cycle: " + beforeCycle);
+            int beforeCycle = ah.getAnnotationsCount();
+            System.out.println("\nannotations before the cycle: " + beforeCycle);
+            if(beforeCycle == 17){
+                System.out.println("argh");
+            }
+            ah.getAnnotationsPositionalStream().forEach(ap->{
+                System.out.println(ap.getKey() + ":");
+                ap.getValue().stream().forEach(a -> System.out.println("  " + a));
+            });
             ruleFactory.getTagPatterns(name).forEach(pat->{
                 ah.getAnnotationsPositionalStream().forEach(a ->{
 
@@ -99,9 +106,8 @@ public class TagRule extends MatchingRule {
                     });
                 }
             });
-
-            if(ah.getAnnotationsCount() == beforeCycle) break;
             System.out.println("annotations now: " + ah.getAnnotationsCount() + ", before: " + beforeCycle);
+            if(ah.getAnnotationsCount() == beforeCycle) break;
             beforeCycle = ah.getAnnotationsCount();
         }
 

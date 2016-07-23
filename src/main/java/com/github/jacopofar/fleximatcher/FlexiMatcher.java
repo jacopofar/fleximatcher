@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 
 public final class FlexiMatcher {
-    
+
     private final ConcurrentHashMap<String,RuleFactory> rules=new ConcurrentHashMap<>();
     private final TagRuleFactory factory;
     /**
@@ -32,8 +32,8 @@ public final class FlexiMatcher {
     public boolean bind(String ruleName,RuleFactory rf){
         return (rules.put(ruleName, rf)!=null);
     }
-    
-    
+
+
     /**
      * Matches the text against the given pattern, using the given annotator
      * @param text the string to match (e.g.: "the dog")
@@ -66,21 +66,19 @@ public final class FlexiMatcher {
             }
         }
         //now the ruleset is created, annotate using it
-        
+
         for(i=0;i<ruleset.length;i++){
-            if(!ruleset[i].isCacheable() || !ah.hasBeenUsed(ruleParts[i])){
-                ah.setCurrentMatcher(ruleParts[i]);
-                ruleset[i].annotate(text, ah);
-            }
+            ah.setCurrentMatcher(ruleParts[i]);
+            ruleset[i].annotate(text, ah);
             ah.rememberUse(ruleParts[i]);
         }
-        
+
         //the text is annotated, is it surely wrong? skip the matching
         if(isSurelyWrong)
             return MatchingResults.noMatch();
         return ah.checkAnnotationSequence(ruleParts, text.length(),matchWhole,populateResult);
     }
-    
+
     /**
      * Check whether the pattern matches the text
      *
@@ -101,7 +99,7 @@ public final class FlexiMatcher {
     public boolean contains(String text,String pattern){
         return matches(text,pattern, getDefaultAnnotator(),false,false,false).isMatching();
     }
-    
+
     public FlexiMatcher(){
         this.bind("r", new RegexRuleFactory());
         this.bind("i", new InsensitiveCaseRuleFactory());
@@ -110,7 +108,7 @@ public final class FlexiMatcher {
         factory=new TagRuleFactory(this);
         this.bind("tag", factory);
     }
-    
+
     public static void main(String argc[]){
         FlexiMatcher fm=new FlexiMatcher();
         fm.addTagRule("fruit","pear","id_pear");
@@ -121,7 +119,7 @@ public final class FlexiMatcher {
         });
         System.out.println(fm.matches(analyzeThis,"the [tag:fruit]", new ResultPrintingAnnotationHandler(analyzeThis),true,false,true));
     }
-    
+
     /**
      * Add a rule to this matcher, which will be used to macth [tag:rulename]
      * @param tag the tag of the rule, which will be used in the tag [tag:name]
@@ -133,7 +131,7 @@ public final class FlexiMatcher {
     public boolean addTagRule(String tag, String pattern, String identifier) {
         return factory.addTagRule(tag,pattern,identifier,null);
     }
-    
+
     /**
      * Add a rule to this matcher, which will be used to match [tag:rulename]
      * @param tag the tag of the rule, which will be used in the tag [tag:name]
@@ -147,8 +145,8 @@ public final class FlexiMatcher {
     public boolean addTagRule(String tag, String pattern, String identifier,String annotationTemplate) {
         return factory.addTagRule(tag,pattern,identifier,annotationTemplate);
     }
-    
-     /**
+
+    /**
      * Add a rule to this matcher, which will be used to match [tag:rulename]
      * @param tag the tag of the rule, which will be used in the tag [tag:name]
      * @param identifier identifier an optional identifier for the rule, will be used to remove it
@@ -160,8 +158,8 @@ public final class FlexiMatcher {
     public boolean addTagRule(String tag, String identifier, RuleDefinition annotationRule) {
         return factory.addTagRule(tag, identifier, annotationRule);
     }
-    
-    
+
+
     /**
      * Remove the rule with the given tag and identifier
      * @return true if a rule was removed
@@ -169,7 +167,7 @@ public final class FlexiMatcher {
     public boolean removeTagRule(String tag,String identifier) {
         return factory.removeTagRule(tag,identifier);
     }
-    
+
     public static AnnotationHandler getDefaultAnnotator() {
         return new DefaultAnnotationHandler();
     }
@@ -193,7 +191,7 @@ public final class FlexiMatcher {
      * Set the maximum nesting level that can be used when matching tags.
      * Since a tag definition can call other tags, recursively, fleximatcher could find loops when matching them.
      * Instead of checking the rules, a maximum recursion level is applied, when it's reached the matching process stops.
-     * 
+     *
      * @param maxDepth the new maximum nesting level to be applied
      */
     public void setMaximumTagNesting(int maxDepth){
