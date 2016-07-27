@@ -153,6 +153,10 @@ public class TagRuleFactory implements RuleFactory {
 
         String result = "";
         for(String part:ExpressionParser.split(c.getPattern())){
+            if(!part.startsWith("[") || !part.endsWith("]")){
+                result += part;
+                continue;
+            }
             String ruleName = ExpressionParser.ruleName(part);
             if(ruleName.isEmpty()){
                 //it's plain text, just use it

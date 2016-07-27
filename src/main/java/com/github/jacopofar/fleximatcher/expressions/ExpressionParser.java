@@ -54,7 +54,7 @@ public class ExpressionParser {
 	 * it will remove the first squared bracket
 	 * */
 	public static String ruleName(String s) {
-		if(s.indexOf(':')==-1)
+		if(s.indexOf(':') == -1)
 			return s.substring(1, s.length()-1);
 		return s.substring(1, s.indexOf(':'));
 	}
