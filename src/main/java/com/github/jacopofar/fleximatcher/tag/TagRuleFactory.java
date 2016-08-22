@@ -146,6 +146,9 @@ public class TagRuleFactory implements RuleFactory {
 
     @Override
     public String generateSample(String parameter) {
+        if (!rules.containsKey(parameter)){
+            return("[tag:" + parameter + "]");
+        }
         int numCandidates = rules.get(parameter).size();
         if(numCandidates == 0) return null;
         int chosen = (int) Math.floor(Math.random() * (numCandidates));
