@@ -153,7 +153,6 @@ public class TagRuleFactory implements RuleFactory {
         if(numCandidates == 0) return null;
         int chosen = (int) Math.floor(Math.random() * (numCandidates));
         RuleDefinition c = rules.get(parameter).get(chosen);
-
         String result = "";
         for(String part:ExpressionParser.split(c.getPattern())){
             if(!part.startsWith("[") || !part.endsWith("]")){
