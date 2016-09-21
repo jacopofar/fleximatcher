@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RuleDefinition {
-    
+
     private final String pattern;
     private final String identifier;
 
@@ -23,28 +23,41 @@ public class RuleDefinition {
         this.pattern=pattern;
         this.identifier=identifier;
     }
-    public RuleDefinition(String pattern, String identifier,String annotationExpression) {
+    /**
+     * Defines a rule with a given pattern, rule identifier and annotationExpression
+     * An annotation expression is a JSON string with (optional) elements delimited by #
+     * for example {"note":"meadow", height":"#1.number#"}
+     *
+     * When generating an annotation, these placeholders will be replaced with the corresponding value.
+     * For example, #1.height# refers to the height value of the annotation with index 1
+     * An index with no property, like #4#, refers to the text covered by a span, not its annotation
+     *
+     * Examples:
+     *
+     *
+     * */
+    public RuleDefinition(String pattern, String identifier, String annotationExpression) {
         try {
             //check it now, it will be stored as a String but it's better to find issues earlier
             if(annotationExpression!=null)
-                new JSONObject(annotationExpression.replaceAll("(#([0-9]+[^#]*)#)+", "''"));
+                new JSONObject(annotationExpression.replaceAll("(#([0-9]+[^#]*)#)+", "\"\""));
         } catch (JSONException e) {
             throw new RuntimeException("Error, the string '" + annotationExpression + "' was transformed into '" + annotationExpression.replaceAll("(#([0-9]+[^#]*)#) + ", "''")+"' which is not a valid JSON string", e);
         }
-        //TODO also check that the expression doesn't try to annotate something out of index, for example the pattern 'a[r:b]c' and the annotation {x:#4#}
+        //TODO maybe check that the expression doesn't try to annotate something out of index, for example the pattern 'a[r:b]c' and the annotation {x:#4#}
         this.pattern=pattern;
         this.identifier=identifier;
         this.annotationExpression=annotationExpression;
     }
-    
+
     public String getPattern() {
         return pattern;
     }
-    
+
     public String getIdentifier() {
         return identifier;
     }
-    
+
     @Override
     public String toString(){
         return "rule ID="+identifier+" pattern='"+pattern+"'"+ (annotationExpression==null?"":"annotation="+annotationExpression);
@@ -53,7 +66,7 @@ public class RuleDefinition {
     public int hashCode(){
         return (pattern.hashCode()+11*(identifier==null?0:identifier.hashCode())+37*(annotationExpression==null?0:annotationExpression.hashCode()));
     }
-    
+
     @Override
     public boolean equals(Object o){
         if(this==o) return true;
@@ -63,67 +76,51 @@ public class RuleDefinition {
                 && (this.identifier==null?((RuleDefinition)o).identifier==null : this.identifier.equals(((RuleDefinition)o).identifier))
                 && (this.annotationExpression==null?((RuleDefinition)o).annotationExpression==null : this.annotationExpression.equals(((RuleDefinition)o).identifier));
     }
-    
+
     /**
      * Get an annotation representing the tag, given the matching sequence
      *
+     *
      * @param text the text this pattern has matched
      * @param matchSequence the list of annotations resulting from the match
-     * @return  a JSONObject representing the annotation content*/
+     * @return  a JSONObject representing the annotation content, null if no annotation expression was specified constructing the object */
     public JSONObject getResultingAnnotation(String text,LinkedList<TextAnnotation> matchSequence) {
-        if(annotationExpression==null)
+        if(annotationExpression == null)
             return null;
-        //System.out.println("matching annotation expression " + annotationExpression + " on sequences " + matchSequence.toString());
         String result = annotationExpression;
         Pattern p = Pattern.compile("#([0-9]+[^#]*)#");
         Matcher m = p.matcher(annotationExpression);
+
         while(m.find()){
             String expr = m.group(1);
             if(expr.matches("[0-9]+")){
-                //System.out.println("expression: " +expr + "for group " + m.toString());
                 String content=JSONObject.quote(
                         matchSequence.get(Integer.parseInt(expr)).getSpan().getCoveredText(text).toString()
                 );
-                result=result.replace(m.group(), content);
+                //the string was quoted to escape quotes, newlines and special characters, but the delimiting quotes have to be removed
+                result = result.replace(m.group(), content.substring(1, content.length() - 1));
             }
-            else
-                if(expr.matches("[0-9]+\\..+")){
-                    String content;
-                    int position=Integer.parseInt(expr.replaceAll("\\..+", ""));
-                   // System.out.println("expression: " +expr + " position: " + position + " for group " + m.toString());
+            else {
+                if(expr.matches("[0-9]+\\..+")) {
+                    int position = Integer.parseInt(expr.replaceAll("\\..+", ""));
                     try {
-                        content = JSONObject.quote(matchSequence.get(position).getJSON().get().getString(expr.replaceAll("[0-9]+\\.", "")));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("error while creating the annotation for " + expr.replaceAll("[0-9]+\\.", "") + " using expression " + annotationExpression +  " : " + e.getMessage());
+                        JSONObject sourceAnnotation = matchSequence.get(position).getJSON().get();
+                        String value = JSONHelper.extract(sourceAnnotation, expr.replaceFirst("^[0-9]+\\.", ""));
+                        result = result.replace(m.group(), value);
                     }
                     catch (NoSuchElementException e){
                         throw new RuntimeException("error while retrieving the existing annotations in " + expr.replaceAll("[0-9]+\\.", "") + " using expression " + annotationExpression +  " : " + e.getMessage());
                     }
-                    //if the content is empty, explicitly use an empty string
-                    //we could have patterns in the form #x##y#, that have been transformed in 'string1''string2', we have to remove the double quotes between them
-                    //System.err.println("   pre:"+result);
-                    if(content.isEmpty())
-                        result=result.replace(m.group(), "''");
-                    else
-                        result=result.replace(m.group(), content.replaceAll("([^:\\\\])\"\"([^,])", "$1$2").replaceAll("([^:])''([^,])", "$1$2"));
-                    //  System.err.println("   post:"+result);
-                    // System.err.println("   content was:"+content);
+                    catch(IndexOutOfBoundsException e) {
+                        throw new RuntimeException("cannot generate the annotation because there are " + matchSequence.size() + " elements and " + expr + " is out of index.");
+                    }
                 }
-        }
-        //		for(int i=0;i<matchSequence.size();i++){
-        //			String c=JSONObject.quote(matchSequence.get(i).getSpan().getCoveredText(text).toString());
-        //			result=result.replace("#"+i+"#", c.substring(1,c.length()-1));
-        //		}
-        try {
-            while(!result.equals(result.replaceAll("([^:\\\\])\"\"([^,])", "$1$2").replaceAll("([^:])''([^,])", "$1$2"))){
-                result=result.replaceAll("([^:\\\\])\"\"([^,])", "$1$2").replaceAll("([^:])''([^,])", "$1$2");
             }
+        }
+        try {
             return new JSONObject(result);
         } catch (JSONException e) {
-            e.printStackTrace();
-            throw new RuntimeException("++++++++++error while creating the annotation "+this.annotationExpression+" for "+text+" \n\n Obtained:\n"+result+"\n which is not a valid JSON");
+            throw new RuntimeException("error while creating the annotation " + this.annotationExpression + " for " + text + " \n Obtained: " + result + ", which is not a valid JSON");
         }
     }
-    
 }
