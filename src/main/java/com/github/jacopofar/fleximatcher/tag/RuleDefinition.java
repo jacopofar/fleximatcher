@@ -37,13 +37,17 @@ public class RuleDefinition {
      *
      * */
     public RuleDefinition(String pattern, String identifier, String annotationExpression) {
-        try {
-            //check it now, it will be stored as a String but it's better to find issues earlier
-            if(annotationExpression!=null)
-                new JSONObject(annotationExpression.replaceAll("(#([0-9]+[^#]*)#)+", "\"\""));
-        } catch (JSONException e) {
-            throw new RuntimeException("Error, the string '" + annotationExpression + "' was transformed into '" + annotationExpression.replaceAll("(#([0-9]+[^#]*)#) + ", "''")+"' which is not a valid JSON string", e);
+        //check it now, it will be stored as a String but it's better to find issues earlier
+        if(annotationExpression != null) {
+            String dummy = annotationExpression.replaceAll("(#([0-9]+[^#]*)#)+", "0");
+            try {
+                new JSONObject(dummy);
+            } catch (JSONException e) {
+                throw new RuntimeException("Error, the string '" + annotationExpression + "' was transformed into '" + dummy+"' which is not a valid JSON string. ", e);
+            }
         }
+
+
         //TODO maybe check that the expression doesn't try to annotate something out of index, for example the pattern 'a[r:b]c' and the annotation {x:#4#}
         this.pattern=pattern;
         this.identifier=identifier;
