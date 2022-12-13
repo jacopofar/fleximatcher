@@ -1,4 +1,7 @@
 [![Build Status](https://travis-ci.org/jacopofar/fleximatcher.svg?branch=master)](https://travis-ci.org/jacopofar/fleximatcher)
+
+## This project is archived because I think there are better solutions actively maintained, for example the spaCy Matcher. I had fun implementing this and I think the concept is still very interesting.
+
 What's this?
 ============
 
